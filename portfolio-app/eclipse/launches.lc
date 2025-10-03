@@ -1,5 +1,5 @@
 eclipse configuration PortfolioPerformance {
-    workspace "${workspace_loc}/../runtime-PortfolioPerformance";
+    workspace "${workspace_loc}/runtime-PP";
     product name.abuchen.portfolio.bootstrap.product;
         
     feature name.abuchen.portfolio.feature;
@@ -27,6 +27,8 @@ eclipse configuration PortfolioPerformance {
     execution-environment 'JavaSE-21';
     
     argument "-consoleLog";
+    argument "-nl";
+    argument "en";
     
     vm-argument "-XX:+IgnoreUnrecognizedVMOptions";
     vm-argument "--add-modules=ALL-SYSTEM";
