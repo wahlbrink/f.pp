@@ -32,6 +32,7 @@ import name.abuchen.portfolio.money.ExchangeRateProviderFactory;
 import name.abuchen.portfolio.money.ExchangeRateTimeSeries;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.BindingHelper;
@@ -260,7 +261,7 @@ public class CurrencyConverterTab implements AbstractTabbedView.Tab
         ShowHideColumnHelper support = new ShowHideColumnHelper(getClass().getSimpleName(), preferences, nodeViewer,
                         layout);
 
-        Column column = new Column("label", Messages.ColumnExchangeRate, SWT.NONE, amountWidth * 5); //$NON-NLS-1$
+        Column column = new Column("label", DataType.NAME, Messages.ColumnExchangeRate, SWT.NONE, amountWidth * 5); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -273,7 +274,7 @@ public class CurrencyConverterTab implements AbstractTabbedView.Tab
         });
         support.addColumn(column);
 
-        column = new Column("value", Messages.ColumnValue, SWT.RIGHT, amountWidth); //$NON-NLS-1$
+        column = new Column("value", DataType.OTHER_NUMBER, Messages.ColumnValue, SWT.RIGHT, amountWidth); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
