@@ -25,6 +25,7 @@ import name.abuchen.portfolio.model.Bookmark;
 import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.ClientSettings;
 import name.abuchen.portfolio.model.Security;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.AbstractFinanceView;
@@ -112,7 +113,7 @@ public class BookmarksListTab implements AbstractTabbedView.Tab, ModificationLis
                         preferences, bookmarks, layout);
 
         // Create Column for Bookmark
-        Column column = new Column(Messages.BookmarksListView_bookmark, SWT.None, 150);
+        Column column = new Column(DataType.NAME, Messages.BookmarksListView_bookmark, SWT.None, 150);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -133,7 +134,7 @@ public class BookmarksListTab implements AbstractTabbedView.Tab, ModificationLis
         support.addColumn(column);
 
         // Create Column for URL
-        column = new Column(Messages.BookmarksListView_url, SWT.None, 500);
+        column = new Column(DataType.OTHER_TEXT, Messages.BookmarksListView_url, SWT.None, 500);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

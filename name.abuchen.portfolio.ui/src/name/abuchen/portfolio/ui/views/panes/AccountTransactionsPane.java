@@ -49,6 +49,7 @@ import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.MutableMoney;
 import name.abuchen.portfolio.money.Quote;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.dialogs.transactions.AccountTransactionDialog;
@@ -85,6 +86,8 @@ import name.abuchen.portfolio.ui.views.actions.ConvertTransferToDepositRemovalAc
 import name.abuchen.portfolio.ui.views.actions.CreateRemovalForDividendAction;
 import name.abuchen.portfolio.ui.views.columns.CalculatedQuoteColumn;
 import name.abuchen.portfolio.ui.views.columns.IsinColumn;
+import name.abuchen.portfolio.ui.views.columns.NameColumn;
+import name.abuchen.portfolio.ui.views.columns.NameColumn.NameColumnLabelProvider;
 import name.abuchen.portfolio.ui.views.columns.NoteColumn;
 import name.abuchen.portfolio.ui.views.columns.SymbolColumn;
 import name.abuchen.portfolio.ui.views.columns.WknColumn;
@@ -162,7 +165,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         transactionsColumns = new ShowHideColumnHelper(AccountListView.class.getSimpleName() + "@bottom5", //$NON-NLS-1$
                         view.getPreferenceStore(), transactions, layout);
 
-        Column column = new Column("0", Messages.ColumnDate, SWT.None, 80); //$NON-NLS-1$
+        Column column = new Column("0", DataType.DATE, Messages.ColumnDate, SWT.None, 80); //$NON-NLS-1$
         column.setLabelProvider(new DateTimeLabelProvider(e -> ((AccountTransaction) e).getDateTime())
         {
             @Override
@@ -175,7 +178,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         new DateTimeEditingSupport(AccountTransaction.class, "dateTime").addListener(this).attachTo(column); //$NON-NLS-1$
         transactionsColumns.addColumn(column);
 
-        column = new Column("1", Messages.ColumnTransactionType, SWT.None, 100); //$NON-NLS-1$
+        column = new Column("1", DataType.TRANSACTION_TYPE, Messages.ColumnTransactionType, SWT.None, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -195,7 +198,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         new TransactionTypeEditingSupport(client).addListener(this).attachTo(column);
         transactionsColumns.addColumn(column);
 
-        column = new Column("2", Messages.ColumnAmount, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("2", DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -227,7 +230,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         }));
         transactionsColumns.addColumn(column);
 
-        column = new Column("fees", Messages.ColumnFees, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("fees", DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80); //$NON-NLS-1$
         Function<AccountTransaction, Money> getFees = tx -> {
             // fees are stored with the portfolio transaction (for example
             // purchase and sale)
@@ -255,7 +258,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         column.setVisible(false);
         transactionsColumns.addColumn(column);
 
-        column = new Column("taxes", Messages.ColumnTaxes, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("taxes", DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80); //$NON-NLS-1$
         Function<AccountTransaction, Money> getTaxes = tx -> {
             // taxes are stored with the portfolio transaction (for example
             // purchase and sale)
@@ -283,7 +286,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         column.setVisible(false);
         transactionsColumns.addColumn(column);
 
-        column = new Column("3", Messages.Balance, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("3", DataType.MONEY, Messages.Balance, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -308,30 +311,17 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         }));
         transactionsColumns.addColumn(column);
 
-        column = new Column("4", Messages.ColumnSecurity, SWT.None, 250); //$NON-NLS-1$
-        column.setLabelProvider(new ColumnLabelProvider()
+        column = new NameColumn("4", //$NON-NLS-1$
+                        (e) -> ((AccountTransaction) e).getSecurity(),
+                        Messages.ColumnSecurity, 250,
+                        new NameColumnLabelProvider(client)
         {
-            @Override
-            public String getText(Object e)
-            {
-                AccountTransaction t = (AccountTransaction) e;
-                return t.getSecurity() != null ? String.valueOf(t.getSecurity()) : null;
-            }
-
             @Override
             public Color getForeground(Object element)
             {
                 return colorFor((AccountTransaction) element);
             }
-
-            @Override
-            public Image getImage(Object e)
-            {
-                AccountTransaction t = (AccountTransaction) e;
-                return LogoManager.instance().getDefaultColumnImage(t.getSecurity(), client.getSettings());
-            }
         });
-        column.setSorter(ColumnViewerSorter.create(AccountTransaction.class, "security")); //$NON-NLS-1$
         transactionsColumns.addColumn(column);
 
         column = new IsinColumn();
@@ -349,7 +339,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         column.getEditingSupport().addListener(this);
         transactionsColumns.addColumn(column);
 
-        column = new Column("5", Messages.ColumnShares, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("5", DataType.NUM_SHARES, Messages.ColumnShares, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new SharesLabelProvider() // NOSONAR
         {
             @Override
@@ -407,7 +397,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         }, element -> colorFor((AccountTransaction) element));
         transactionsColumns.addColumn(column);
 
-        column = new Column("7", Messages.ColumnOffsetAccount, SWT.None, 120); //$NON-NLS-1$
+        column = new Column("7", DataType.NAME, Messages.ColumnOffsetAccount, SWT.None, 120); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -439,7 +429,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         column.getEditingSupport().addListener(this);
         transactionsColumns.addColumn(column);
 
-        column = new Column("exdate", Messages.ColumnExDate, SWT.None, 80); //$NON-NLS-1$
+        column = new Column("exdate", DataType.DATE, Messages.ColumnExDate, SWT.None, 80); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -460,7 +450,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
         column.setVisible(false);
         transactionsColumns.addColumn(column);
 
-        column = new Column("source", Messages.ColumnSource, SWT.None, 120); //$NON-NLS-1$
+        column = new Column("source", DataType.NAME, Messages.ColumnSource, SWT.None, 120); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

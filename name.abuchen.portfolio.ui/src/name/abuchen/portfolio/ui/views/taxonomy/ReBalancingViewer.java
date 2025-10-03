@@ -29,6 +29,7 @@ import name.abuchen.portfolio.model.SecurityPrice;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.AssetPosition;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.AbstractFinanceView;
@@ -229,7 +230,8 @@ public class ReBalancingViewer extends AbstractNodeTreeViewer
 
         addDesiredAllocationColumn(support);
 
-        Column column = new Column("used-for-rebalancing", Messages.ColumnUsedForRebalancing, SWT.RIGHT, 40); //$NON-NLS-1$
+        Column column = new Column("used-for-rebalancing", DataType.OTHER_BOOLEAN, Messages.ColumnUsedForRebalancing, //$NON-NLS-1$
+                        SWT.RIGHT, 40);
         column.setDescription(Messages.ColumnUsedForRebalancing_Description);
         column.setLabelProvider(new ColumnLabelProvider()
         {
@@ -272,7 +274,7 @@ public class ReBalancingViewer extends AbstractNodeTreeViewer
                         }).addListener(this::onModified).attachTo(column);
         support.addColumn(column);
 
-        column = new Column("targetvalue", Messages.ColumnTargetValue, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("targetvalue", DataType.MONEY, Messages.ColumnTargetValue, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -385,7 +387,7 @@ public class ReBalancingViewer extends AbstractNodeTreeViewer
         column.setVisible(false);
         support.addColumn(column);
 
-        column = new Column("delta", Messages.ColumnDeltaValue, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("delta", DataType.MONEY, Messages.ColumnDeltaValue, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -462,7 +464,7 @@ public class ReBalancingViewer extends AbstractNodeTreeViewer
         column.setVisible(false);
         support.addColumn(column);
 
-        column = new Column("rebalanceAmount", Messages.ColumnRebalanceAmount, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("rebalanceAmount", DataType.MONEY, Messages.ColumnRebalanceAmount, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -530,7 +532,7 @@ public class ReBalancingViewer extends AbstractNodeTreeViewer
         });
         support.addColumn(column);
 
-        column = new Column("quote", Messages.ColumnQuote, SWT.RIGHT, 60); //$NON-NLS-1$
+        column = new Column("quote", DataType.QUOTE, Messages.ColumnQuote, SWT.RIGHT, 60); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -571,7 +573,7 @@ public class ReBalancingViewer extends AbstractNodeTreeViewer
         column.setVisible(false);
         support.addColumn(column);
 
-        column = new Column("deltashares", Messages.ColumnDeltaShares, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("deltashares", DataType.NUM_SHARES, Messages.ColumnDeltaShares, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

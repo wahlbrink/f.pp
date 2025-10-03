@@ -54,8 +54,8 @@ public class AttributeColumnTest
         var securityColumn = columns.stream().filter(c -> c.getId().equals("attribute$shared")).findFirst().orElseThrow();
         var accountColumn = columns.stream().filter(c -> c.getId().equals("attribute$account$shared")).findFirst()
                         .orElseThrow();
-        var securityLabels = (ColumnLabelProvider) securityColumn.getLabelProvider().get();
-        var accountLabels = (ColumnLabelProvider) accountColumn.getLabelProvider().get();
+        var securityLabels = (ColumnLabelProvider) securityColumn.getLabelProvider();
+        var accountLabels = (ColumnLabelProvider) accountColumn.getLabelProvider();
 
         assertThat(securityLabels.getText(security), is("security value"));
         assertThat(securityLabels.getText(account), is(nullValue()));

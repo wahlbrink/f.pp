@@ -15,6 +15,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.Widget;
 
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 
 public class Column
@@ -60,6 +61,8 @@ public class Column
      */
     private String id;
 
+    private DataType dataType;
+
     private String label;
     private int style;
     private int defaultWidth;
@@ -91,14 +94,20 @@ public class Column
 
     private ColumnEditingSupport editingSupport;
 
-    public Column(String label, int style, int defaultWidth)
+    public Column(DataType dataType, String label, int style, int defaultWidth)
     {
-        this(null, label, style, defaultWidth);
+        this(null, dataType, label, style, defaultWidth);
     }
 
     public Column(String id, String label, int style, int defaultWidth)
     {
+        this(id, DataType.OTHER_NUMBER, label, style, defaultWidth);
+    }
+
+    public Column(String id, DataType dataType, String label, int style, int defaultWidth)
+    {
         this.id = id;
+        this.dataType = dataType;
         this.label = label;
         this.style = style;
         this.defaultWidth = defaultWidth;
@@ -136,6 +145,11 @@ public class Column
     /* package */void setId(String id)
     {
         this.id = id;
+    }
+
+    public DataType getDataType()
+    {
+        return this.dataType;
     }
 
     public void setVisible(boolean isVisible)
@@ -275,9 +289,9 @@ public class Column
         return defaultSortDirection;
     }
 
-    public Supplier<CellLabelProvider> getLabelProvider()
+    public CellLabelProvider getLabelProvider()
     {
-        return labelProvider != null ? labelProvider : () -> null;
+        return labelProvider != null ? labelProvider.get() : null;
     }
 
     public ElementOptionFunction<Object> getToolTipProvider()

@@ -49,6 +49,7 @@ import name.abuchen.portfolio.model.Classification;
 import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.filter.PortfolioClientFilter;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.ClientFilterMenu;
@@ -233,7 +234,7 @@ public class EditClientFilterDialog extends Dialog
         ShowHideColumnHelper columns = new ShowHideColumnHelper(EditClientFilterDialog.class.toString() + "$v2", //$NON-NLS-1$
                         preferences, treeViewer, layout);
 
-        Column column = new Column(Messages.ColumnName, SWT.NONE, 100);
+        Column column = new Column(DataType.NAME, Messages.ColumnName, SWT.NONE, 100);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -258,7 +259,7 @@ public class EditClientFilterDialog extends Dialog
 
         columns.addColumn(column);
 
-        column = new Column(Messages.ColumnWeight, SWT.RIGHT, 80);
+        column = new Column(DataType.OTHER_NUMBER, Messages.ColumnWeight, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

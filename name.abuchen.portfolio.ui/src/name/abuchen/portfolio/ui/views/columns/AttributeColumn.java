@@ -22,7 +22,10 @@ import name.abuchen.portfolio.model.Account;
 import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.model.Attributable;
 import name.abuchen.portfolio.model.AttributeType;
+import name.abuchen.portfolio.model.AttributeType.AmountConverter;
 import name.abuchen.portfolio.model.AttributeType.ImageConverter;
+import name.abuchen.portfolio.model.AttributeType.QuoteConverter;
+import name.abuchen.portfolio.model.AttributeType.ShareConverter;
 import name.abuchen.portfolio.model.Attributes;
 import name.abuchen.portfolio.model.Bookmark;
 import name.abuchen.portfolio.model.Client;
@@ -33,6 +36,7 @@ import name.abuchen.portfolio.model.Portfolio;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityPrice;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.Colors;
@@ -48,6 +52,36 @@ import name.abuchen.portfolio.util.Pair;
 
 public class AttributeColumn extends Column
 {
+    private static final DataType getDataType(AttributeType attribute)
+    {
+        if (attribute.getType() == LocalDate.class)
+        {
+            return DataType.DATE;
+        }
+        else if (attribute.getType() == String.class)
+        {
+            if (attribute.getConverter() instanceof ImageConverter)
+                return DataType.OTHER;
+            return DataType.OTHER_TEXT;
+        }
+        else if (attribute.getType() == Boolean.class)
+        {
+            return DataType.OTHER_BOOLEAN;
+        }
+        else if (attribute.getType() == Bookmark.class)
+        {
+            return DataType.OTHER_TEXT;
+        }
+        else
+            return switch (attribute.getConverter())
+            {
+                case AmountConverter c -> DataType.MONEY;
+                case QuoteConverter c -> DataType.QUOTE;
+                case ShareConverter c -> DataType.NUM_SHARES;
+                default -> DataType.OTHER_NUMBER;
+            };
+    }
+
     private static final class AttributeComparator implements Comparator<Object>
     {
         private final AttributeType attribute;
@@ -370,7 +404,7 @@ public class AttributeColumn extends Column
 
     private AttributeColumn(String idPrefix, final AttributeType attribute)
     {
-        super(idPrefix + attribute.getId(), attribute.getColumnLabel(), // $NON-NLS-1$
+        super(idPrefix + attribute.getId(), getDataType(attribute), attribute.getColumnLabel(), // $NON-NLS-1$
                         attribute.isNumber() ? SWT.RIGHT : SWT.LEFT, 80);
 
         setMenuLabel(attribute.getName());
@@ -498,7 +532,7 @@ public class AttributeColumn extends Column
     private static Column createDaysLeftColumn(String idPrefix, AttributeType attribute)
     {
         Column column;
-        column = new Column(idPrefix + attribute.getId() + "-daysbetween", //$NON-NLS-1$
+        column = new Column(idPrefix + attribute.getId() + "-daysbetween", DataType.OTHER_NUMBER, //$NON-NLS-1$
                         attribute.getColumnLabel() + " - " + Messages.ColumnDaysBetweenPostfix, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setMenuLabel(attribute.getName() + " - " + Messages.ColumnDaysBetweenPostfix); //$NON-NLS-1$
         column.setGroupLabel(Messages.GroupLabelAttributes);
