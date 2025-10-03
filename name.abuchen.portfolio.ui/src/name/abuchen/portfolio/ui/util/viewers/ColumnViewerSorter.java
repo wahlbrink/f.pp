@@ -277,13 +277,16 @@ public final class ColumnViewerSorter
         private ColumnViewer columnViewer;
         private ViewerColumn viewerColumn;
         private Comparator<Object> comparator;
-        private int direction = SWT.DOWN;
+        private int defaultDirection;
+        private int direction;
 
-        public ViewerSorter(ColumnViewer columnViewer, ViewerColumn viewerColumn, Comparator<Object> comparator)
+        public ViewerSorter(ColumnViewer columnViewer, ViewerColumn viewerColumn, Comparator<Object> comparator,
+                        int defaultDirection)
         {
             this.columnViewer = columnViewer;
             this.viewerColumn = viewerColumn;
             this.comparator = comparator;
+            this.direction = this.defaultDirection = defaultDirection;
 
             Widget widget;
 
@@ -321,7 +324,9 @@ public final class ColumnViewerSorter
             if (columnIsCurrentlySorted)
                 setSorter(direction == SWT.DOWN ? SWT.UP : SWT.DOWN);
             else
-                setSorter(SWT.DOWN);
+            {
+                setSorter(defaultDirection);
+            }
         }
 
         private void setSorter(int direction)
@@ -485,7 +490,7 @@ public final class ColumnViewerSorter
 
     public void attachTo(ColumnViewer viewer, ViewerColumn column, int direction)
     {
-        ViewerSorter x = new ViewerSorter(viewer, column, comparator);
+        ViewerSorter x = new ViewerSorter(viewer, column, comparator, defaultDirection);
 
         if (direction != SWT.NONE)
             x.setSorter(direction);
