@@ -36,6 +36,7 @@ import name.abuchen.portfolio.model.Transaction;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.MutableMoney;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.dialogs.balance.TroubleshootBalanceDiscrepancyDialog;
@@ -210,8 +211,8 @@ public class AccountListView extends AbstractFinanceView implements Modification
         accountColumns = new ShowHideColumnHelper(AccountListView.class.getSimpleName() + "@top2", //$NON-NLS-1$
                         getPreferenceStore(), accounts, layout);
 
-        Column column = new NameColumn("0", Messages.ColumnAccount, SWT.None, 150, getClient()); //$NON-NLS-1$
-        column.setLabelProvider(new NameColumnLabelProvider(getClient()) // NOSONAR
+        Column column = new NameColumn("0", Messages.ColumnAccount, 150, // //$NON-NLS-1$
+                        new NameColumnLabelProvider(getClient()) // NOSONAR
         {
             @Override
             public Color getForeground(Object e)
@@ -223,7 +224,7 @@ public class AccountListView extends AbstractFinanceView implements Modification
         column.getEditingSupport().addListener(this);
         accountColumns.addColumn(column);
 
-        column = new Column("1", Messages.ColumnBalance, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("1", DataType.MONEY, Messages.ColumnBalance, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setDescription(Messages.ColumnBalance_Description);
         column.setLabelProvider(new ColumnLabelProvider()
         {

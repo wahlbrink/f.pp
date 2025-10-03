@@ -26,6 +26,7 @@ import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.SecurityPosition;
 import name.abuchen.portfolio.snapshot.security.BaseSecurityPerformanceRecord;
 import name.abuchen.portfolio.snapshot.security.CalculationLineItem;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.DropDown;
@@ -38,6 +39,7 @@ import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
 import name.abuchen.portfolio.ui.util.viewers.DateTimeLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.SharesLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
+import name.abuchen.portfolio.ui.views.columns.NoteColumn;
 
 public class CalculationLineItemPane implements InformationPanePage
 {
@@ -97,13 +99,13 @@ public class CalculationLineItemPane implements InformationPanePage
     private void createTransactionColumns(ShowHideColumnHelper support)
     {
         // date
-        Column column = new Column(Messages.ColumnDate, SWT.None, 80);
+        Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 80);
         column.setLabelProvider(new DateTimeLabelProvider(e -> ((CalculationLineItem) e).getDateTime()));
         column.setSorter(ColumnViewerSorter.create(CalculationLineItem.BY_DATE), SWT.DOWN);
         support.addColumn(column);
 
         // transaction type
-        column = new Column(Messages.ColumnTransactionType, SWT.None, 80);
+        column = new Column(DataType.OTHER_TEXT, Messages.ColumnTransactionType, SWT.None, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -115,7 +117,7 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // shares
-        column = new Column(Messages.ColumnShares, SWT.None, 80);
+        column = new Column(DataType.NUM_SHARES, Messages.ColumnShares, SWT.None, 80);
         column.setLabelProvider(new SharesLabelProvider() // NOSONAR
         {
             @Override
@@ -137,7 +139,7 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // dividend amount
-        column = new Column(Messages.ColumnDividendPayment, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnDividendPayment, SWT.RIGHT, 80);
         column.setDescription(Messages.ColumnGrossDividend);
         column.setLabelProvider(new ColumnLabelProvider()
         {
@@ -154,7 +156,7 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // dividend per share
-        column = new Column(Messages.ColumnDividendPerShare, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnDividendPerShare, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -170,7 +172,7 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // dividend per share
-        column = new Column(Messages.ColumnPersonalDividendYield, SWT.RIGHT, 80);
+        column = new Column(DataType.OTHER_NUMBER, Messages.ColumnPersonalDividendYield, SWT.RIGHT, 80);
         column.setDescription(Messages.ColumnPersonalDividendYield_Description);
         column.setLabelProvider(new ColumnLabelProvider()
         {
@@ -187,7 +189,7 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // dividend per share (moving average)
-        column = new Column(Messages.ColumnPersonalDividendYieldMovingAverage, SWT.RIGHT, 80);
+        column = new Column(DataType.OTHER_NUMBER, Messages.ColumnPersonalDividendYieldMovingAverage, SWT.RIGHT, 80);
         column.setDescription(Messages.ColumnPersonalDividendYieldMovingAverage_Description);
         column.setLabelProvider(new ColumnLabelProvider()
         {
@@ -204,7 +206,7 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // einstandskurs / bewertung
-        column = new Column(Messages.ColumnAmount, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -220,7 +222,7 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // purchase quote
-        column = new Column(Messages.ColumnQuote, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnQuote, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -241,7 +243,7 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // gegenkonto
-        column = new Column(Messages.ColumnAccount, SWT.None, 120);
+        column = new Column(DataType.NAME, Messages.ColumnAccount, SWT.None, 120);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -261,37 +263,8 @@ public class CalculationLineItemPane implements InformationPanePage
         support.addColumn(column);
 
         // note
-        column = new Column("note", Messages.ColumnNote, SWT.LEFT, 200); //$NON-NLS-1$
-        column.setLabelProvider(new ColumnLabelProvider()
-        {
-            @Override
-            public String getText(Object e)
-            {
-                Optional<Transaction> transaction = ((CalculationLineItem) e).getTransaction();
-                return transaction.isPresent() ? transaction.get().getNote() : null;
-            }
-
-            @Override
-            public Image getImage(Object e)
-            {
-                String note = getText(e);
-                return note != null && note.length() > 0 ? Images.NOTE.image() : null;
-            }
-        });
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> {
-
-            Optional<Transaction> t1 = ((CalculationLineItem) o1).getTransaction();
-            String s1 = t1.isPresent() ? t1.get().getNote() : ""; //$NON-NLS-1$
-            Optional<Transaction> t2 = ((CalculationLineItem) o2).getTransaction();
-            String s2 = t2.isPresent() ? t2.get().getNote() : ""; //$NON-NLS-1$
-            // notes can be null
-            if (s1 == null)
-                s1 = ""; //$NON-NLS-1$
-            if (s2 == null)
-                s2 = ""; //$NON-NLS-1$
-
-            return s1.compareTo(s2);
-        }));
+        column = new NoteColumn((e) -> ((CalculationLineItem) e).getTransaction()
+                        .map(Transaction::getNote).orElse(null));
         support.addColumn(column);
     }
 

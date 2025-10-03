@@ -48,6 +48,7 @@ import name.abuchen.portfolio.model.Account;
 import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.Portfolio;
 import name.abuchen.portfolio.snapshot.filter.PortfolioClientFilter;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.ClientFilterMenu;
@@ -166,7 +167,7 @@ public class EditClientFilterDialog extends Dialog
         ShowHideColumnHelper columns = new ShowHideColumnHelper(EditClientFilterDialog.class.toString(), preferences,
                         treeViewer, layout);
 
-        Column column = new Column(Messages.ColumnName, SWT.NONE, 100);
+        Column column = new Column(DataType.NAME, Messages.ColumnName, SWT.NONE, 100);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

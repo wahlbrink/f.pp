@@ -37,6 +37,7 @@ import name.abuchen.portfolio.money.CurrencyConverterImpl;
 import name.abuchen.portfolio.money.ExchangeRateProviderFactory;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.PortfolioSnapshot;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.AbstractFinanceView;
@@ -206,20 +207,20 @@ public class PortfolioListView extends AbstractFinanceView implements Modificati
         portfolioColumns = new ShowHideColumnHelper(PortfolioListView.class.getSimpleName() + "@top2", //$NON-NLS-1$
                         getPreferenceStore(), portfolios, layout);
 
-        Column column = new NameColumn("0", Messages.ColumnPortfolio, SWT.None, 100, getClient()); //$NON-NLS-1$
-        column.setLabelProvider(new NameColumnLabelProvider(getClient()) // NOSONAR
-        {
-            @Override
-            public Color getForeground(Object e)
-            {
-                boolean isRetired = ((Portfolio) e).isRetired();
-                return isRetired ? Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY) : null;
-            }
-        });
+        Column column = new NameColumn("0", Messages.ColumnPortfolio, 100, //$NON-NLS-1$
+                        new NameColumnLabelProvider(getClient()) // NOSONAR
+                {
+                    @Override
+                    public Color getForeground(Object e)
+                    {
+                        boolean isRetired = ((Portfolio) e).isRetired();
+                        return isRetired ? Display.getDefault().getSystemColor(SWT.COLOR_DARK_GRAY) : null;
+                    }
+                });
         column.getEditingSupport().addListener(this);
         portfolioColumns.addColumn(column);
 
-        column = new Column("1", Messages.ColumnReferenceAccount, SWT.None, 160); //$NON-NLS-1$
+        column = new Column("1", DataType.NAME, Messages.ColumnReferenceAccount, SWT.None, 160); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -236,7 +237,7 @@ public class PortfolioListView extends AbstractFinanceView implements Modificati
                         .addListener(this).attachTo(column);
         portfolioColumns.addColumn(column);
 
-        column = new Column("volume", Messages.ColumnVolumeOfSecurityDeposits, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("volume", DataType.MONEY, Messages.ColumnVolumeOfSecurityDeposits, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             CurrencyConverter converter = new CurrencyConverterImpl(factory, getClient().getBaseCurrency());
@@ -264,7 +265,7 @@ public class PortfolioListView extends AbstractFinanceView implements Modificati
         }));
         portfolioColumns.addColumn(column);
 
-        column = new Column("ref_cash_bal", Messages.ColumnBalanceOfReferenceAccount, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("ref_cash_bal", DataType.MONEY, Messages.ColumnBalanceOfReferenceAccount, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

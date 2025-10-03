@@ -35,7 +35,7 @@ import name.abuchen.portfolio.model.Transaction;
 import name.abuchen.portfolio.model.TransactionPair;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
-import name.abuchen.portfolio.ui.Images;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.AbstractFinanceView;
 import name.abuchen.portfolio.ui.selection.SecuritySelection;
@@ -52,21 +52,19 @@ import name.abuchen.portfolio.ui.util.viewers.DateTimeEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.DateTimeLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.SharesLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
-import name.abuchen.portfolio.ui.util.viewers.StringEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.TransactionOwnerListEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.TransactionTypeEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.ValueEditingSupport;
 import name.abuchen.portfolio.ui.views.columns.IsinColumn;
+import name.abuchen.portfolio.ui.views.columns.NoteColumn;
 import name.abuchen.portfolio.ui.views.columns.SymbolColumn;
 import name.abuchen.portfolio.ui.views.columns.WknColumn;
-import name.abuchen.portfolio.util.TextUtil;
 
 public final class TransactionsViewer implements ModificationListener
 {
     private class TransactionLabelProvider extends ColumnLabelProvider
     {
-        private Function<Transaction, String> label;
-        private Function<TransactionPair<?>, Object> img;
+        private ColumnLabelProvider baseProvider;
 
         public TransactionLabelProvider(Function<Transaction, String> label)
         {
@@ -75,19 +73,39 @@ public final class TransactionsViewer implements ModificationListener
 
         public TransactionLabelProvider(Function<Transaction, String> label, Function<TransactionPair<?>, Object> img)
         {
-            this.label = Objects.requireNonNull(label);
-            this.img = img;
+            Objects.requireNonNull(label);
+            this.baseProvider = new ColumnLabelProvider() {
+                @Override
+                public String getText(Object element)
+                {
+                    return label.apply(((TransactionPair<?>) element).getTransaction());
+                }
+                @Override
+                public Image getImage(Object element)
+                {
+                    if (img == null)
+                        return null;
+                    Object subject = img.apply((TransactionPair<?>) element);
+                    return LogoManager.instance().getDefaultColumnImage(subject, owner.getClient().getSettings());
+                }
+            };
         }
 
         public TransactionLabelProvider(ColumnLabelProvider labelProvider)
         {
-            this.label = labelProvider::getText;
+            this.baseProvider = labelProvider;
         }
 
         @Override
         public String getText(Object element)
         {
-            return label.apply(((TransactionPair<?>) element).getTransaction());
+            return baseProvider.getText(element);
+        }
+
+        @Override
+        public Image getImage(Object element)
+        {
+            return baseProvider.getImage(element);
         }
 
         @Override
@@ -107,19 +125,18 @@ public final class TransactionsViewer implements ModificationListener
         }
 
         @Override
-        public Image getImage(Object element)
-        {
-            if (img == null)
-                return null;
-            Object subject = img.apply((TransactionPair<?>) element);
-            return LogoManager.instance().getDefaultColumnImage(subject, owner.getClient().getSettings());
-        }
-
-        @Override
         public Color getBackground(Object element)
         {
             return marked.contains(element) ? Colors.theme().warningBackground() : null;
         }
+
+        @Override
+        public String getToolTipText(Object element)
+        {
+            return baseProvider.getToolTipText(element);
+        }
+        
+
     }
 
     @Inject
@@ -247,7 +264,7 @@ public final class TransactionsViewer implements ModificationListener
     {
         TransactionLabelProvider colors = new TransactionLabelProvider(t -> null);
 
-        Column column = new Column("0", Messages.ColumnDate, SWT.None, 80); //$NON-NLS-1$
+        Column column = new Column("0", DataType.DATE, Messages.ColumnDate, SWT.None, 80); //$NON-NLS-1$
         column.setLabelProvider(new DateTimeLabelProvider(e -> ((TransactionPair<?>) e).getTransaction().getDateTime())
         {
             @Override
@@ -267,7 +284,7 @@ public final class TransactionsViewer implements ModificationListener
         new DateTimeEditingSupport(Transaction.class, "dateTime").addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column("1", Messages.ColumnTransactionType, SWT.None, 80); //$NON-NLS-1$
+        column = new Column("1", DataType.TRANSACTION_TYPE, Messages.ColumnTransactionType, SWT.None, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(t -> {
             if (t instanceof PortfolioTransaction pt)
                 return pt.getType().toString();
@@ -288,7 +305,7 @@ public final class TransactionsViewer implements ModificationListener
         new TransactionTypeEditingSupport(owner.getClient()).addListener(this).attachTo(column);
         support.addColumn(column);
 
-        column = new Column("2", Messages.ColumnSecurity, SWT.None, 250); //$NON-NLS-1$
+        column = new Column("2", DataType.NAME, Messages.ColumnSecurity, SWT.None, 250); //$NON-NLS-1$
         column.setLabelProvider(
                         new TransactionLabelProvider(t -> t.getSecurity() != null ? t.getSecurity().getName() : null,
                                         t -> t.getTransaction().getSecurity()));
@@ -300,23 +317,23 @@ public final class TransactionsViewer implements ModificationListener
 
         column = new IsinColumn();
         column.setVisible(false);
-        column.setLabelProvider(new TransactionLabelProvider((ColumnLabelProvider) column.getLabelProvider().get()));
+        column.setLabelProvider(new TransactionLabelProvider((ColumnLabelProvider) column.getLabelProvider()));
         column.getEditingSupport().addListener(this);
         support.addColumn(column);
 
         column = new SymbolColumn();
         column.setVisible(false);
-        column.setLabelProvider(new TransactionLabelProvider((ColumnLabelProvider) column.getLabelProvider().get()));
+        column.setLabelProvider(new TransactionLabelProvider((ColumnLabelProvider) column.getLabelProvider()));
         column.getEditingSupport().addListener(this);
         support.addColumn(column);
 
         column = new WknColumn();
         column.setVisible(false);
-        column.setLabelProvider(new TransactionLabelProvider((ColumnLabelProvider) column.getLabelProvider().get()));
+        column.setLabelProvider(new TransactionLabelProvider((ColumnLabelProvider) column.getLabelProvider()));
         column.getEditingSupport().addListener(this);
         support.addColumn(column);
 
-        column = new Column("3", Messages.ColumnShares, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("3", DataType.NUM_SHARES, Messages.ColumnShares, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new SharesLabelProvider() // NOSONAR
         {
             @Override
@@ -348,7 +365,7 @@ public final class TransactionsViewer implements ModificationListener
                         .addListener(this).attachTo(column);
         support.addColumn(column);
 
-        column = new Column("4", Messages.ColumnQuote, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("4", DataType.MONEY, Messages.ColumnQuote, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(t -> {
             if (t instanceof PortfolioTransaction pt)
                 return t.getShares() != 0
@@ -364,7 +381,7 @@ public final class TransactionsViewer implements ModificationListener
         }).attachTo(column);
         support.addColumn(column);
 
-        column = new Column("5", Messages.ColumnAmount, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("5", DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(t -> {
             Money m;
             if (t instanceof PortfolioTransaction pt)
@@ -379,27 +396,27 @@ public final class TransactionsViewer implements ModificationListener
         }).attachTo(column);
         support.addColumn(column);
 
-        column = new Column("6", Messages.ColumnFees, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("6", DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(t -> Values.Money
                         .formatNonZero(t.getUnitSum(Transaction.Unit.Type.FEE), owner.getClient().getBaseCurrency())));
         ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Transaction.Unit.Type.FEE))
                         .attachTo(column);
         support.addColumn(column);
 
-        column = new Column("7", Messages.ColumnTaxes, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("7", DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(t -> Values.Money
                         .formatNonZero(t.getUnitSum(Transaction.Unit.Type.TAX), owner.getClient().getBaseCurrency())));
         ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Transaction.Unit.Type.TAX))
                         .attachTo(column);
         support.addColumn(column);
 
-        column = new Column("8", Messages.ColumnNetValue, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("8", DataType.MONEY, Messages.ColumnNetValue, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(
                         t -> Values.Money.format(t.getMonetaryAmount(), owner.getClient().getBaseCurrency())));
         ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getMonetaryAmount()).attachTo(column);
         support.addColumn(column);
 
-        column = new Column("account", Messages.ColumnAccount, SWT.None, 120); //$NON-NLS-1$
+        column = new Column("account", DataType.NAME, Messages.ColumnAccount, SWT.None, 120); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(t -> null, t -> t.getOwner()) // NOSONAR
         {
             @Override
@@ -413,7 +430,7 @@ public final class TransactionsViewer implements ModificationListener
         ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getOwner().toString()).attachTo(column);
         support.addColumn(column);
 
-        column = new Column("9", Messages.ColumnOffsetAccount, SWT.None, 120); //$NON-NLS-1$
+        column = new Column("9", DataType.NAME, Messages.ColumnOffsetAccount, SWT.None, 120); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(
                         t -> t.getCrossEntry() != null ? t.getCrossEntry().getCrossOwner(t).toString() : null,
                         t -> t.getTransaction().getCrossEntry() != null
@@ -427,40 +444,12 @@ public final class TransactionsViewer implements ModificationListener
         }).attachTo(column);
         support.addColumn(column);
 
-        column = new Column("10", Messages.ColumnNote, SWT.None, 200); //$NON-NLS-1$
-        column.setLabelProvider(new TransactionLabelProvider(Transaction::getNote) // NOSONAR
-        {
-            private String getRawText(Object e)
-            {
-                return ((TransactionPair<?>) e).getTransaction().getNote();
-            }
-
-            @Override
-            public String getText(Object e)
-            {
-                String note = getRawText(e);
-                return note == null || note.isEmpty() ? null : TextUtil.toSingleLine(note);
-            }
-
-            @Override
-            public Image getImage(Object e)
-            {
-                String note = getRawText(e);
-                return note != null && !note.isEmpty() ? Images.NOTE.image() : null;
-            }
-
-            @Override
-            public String getToolTipText(Object e)
-            {
-                String note = getRawText(e);
-                return note == null || note.isEmpty() ? null : TextUtil.wordwrap(note);
-            }
-        });
-        ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getTransaction().getNote()).attachTo(column); // $NON-NLS-1$
-        new StringEditingSupport(Transaction.class, "note").addListener(this).attachTo(column); //$NON-NLS-1$
+        column = new NoteColumn("10"); //$NON-NLS-1$
+        column.setLabelProvider(new TransactionLabelProvider((ColumnLabelProvider) column.getLabelProvider()));
+        column.getEditingSupport().addListener(this);
         support.addColumn(column);
 
-        column = new Column("source", Messages.ColumnSource, SWT.None, 200); //$NON-NLS-1$
+        column = new Column("source", DataType.NAME, Messages.ColumnSource, SWT.None, 200); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(Transaction::getSource));
         ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getTransaction().getSource())
                         .attachTo(column); // $NON-NLS-1$

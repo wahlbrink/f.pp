@@ -291,7 +291,7 @@ public class ShowHideColumnHelper implements IMenuListener, ConfigurationStoreOw
 
             layout.setColumnData(tableColumn, new ColumnPixelData(width));
 
-            CellLabelProvider labelProvider = column.getLabelProvider().get();
+            CellLabelProvider labelProvider = column.getLabelProvider();
             col.setLabelProvider(labelProvider);
 
             if (labelProvider instanceof CellItemImageClickedListener listener)
@@ -458,7 +458,7 @@ public class ShowHideColumnHelper implements IMenuListener, ConfigurationStoreOw
 
             layout.setColumnData(treeColumn, new ColumnPixelData(width));
 
-            CellLabelProvider labelProvider = column.getLabelProvider().get();
+            CellLabelProvider labelProvider = column.getLabelProvider();
             col.setLabelProvider(labelProvider);
 
             setCommonParameters(column, col, direction);

@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.Color;
 import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.money.Quote;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 
@@ -22,7 +23,7 @@ public class CalculatedQuoteColumn extends Column
     public CalculatedQuoteColumn(String id, Client client, Function<Object, Quote> quoteProvider,
                     Function<Object, Color> foregroundColorProvider)
     {
-        super(id, Messages.ColumnPerShare, SWT.RIGHT, 80);
+        super(id, DataType.MONEY, Messages.ColumnPerShare, SWT.RIGHT, 80);
 
         setDescription(Messages.ColumnPerShare_Description);
         setLabelProvider(new ColumnLabelProvider()

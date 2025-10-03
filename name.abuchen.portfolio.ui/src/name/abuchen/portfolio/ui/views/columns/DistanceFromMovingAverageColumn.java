@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.CacheKey;
@@ -141,7 +142,7 @@ public class DistanceFromMovingAverageColumn extends Column implements Column.Ca
 
     public DistanceFromMovingAverageColumn(Supplier<LocalDate> dateProvider)
     {
-        super("distance-from-sma", Messages.ColumnDistanceFromMovingAverage, SWT.RIGHT, 85); //$NON-NLS-1$
+        super("distance-from-sma", DataType.QUOTE_DIFF, Messages.ColumnDistanceFromMovingAverage, SWT.RIGHT, 85); //$NON-NLS-1$
 
         List<Integer> smaIntervals = Arrays.asList(5, 20, 30, 38, 50, 90, 100, 200);
         BiFunction<Object, Integer, Double> valueProvider = (element, option) -> {

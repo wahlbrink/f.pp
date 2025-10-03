@@ -28,6 +28,7 @@ import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityEvent;
 import name.abuchen.portfolio.model.SecurityEvent.DividendEvent;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.ContextMenu;
@@ -103,7 +104,7 @@ public class SecurityEventsPane implements InformationPanePage
         ShowHideColumnHelper support = new ShowHideColumnHelper(SecurityEventsPane.class.getSimpleName(), // $NON-NLS-1$
                         preferences, events, layout);
 
-        Column column = new Column(Messages.ColumnDate, SWT.None, 80);
+        Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 80);
         column.setLabelProvider(new DateLabelProvider(e -> ((SecurityEvent) e).getDate()));
         column.setSorter(ColumnViewerSorter.create(e -> ((SecurityEvent) e).getDate()), SWT.DOWN);
         column.setEditingSupport(new DateEditingSupport(SecurityEvent.class, "date") //$NON-NLS-1$
@@ -116,7 +117,7 @@ public class SecurityEventsPane implements InformationPanePage
         });
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnTransactionType, SWT.None, 120);
+        column = new Column(DataType.OTHER_TEXT, Messages.ColumnTransactionType, SWT.None, 120);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -128,14 +129,14 @@ public class SecurityEventsPane implements InformationPanePage
         column.setSorter(ColumnViewerSorter.create(e -> ((SecurityEvent) e).getType()));
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnPaymentDate, SWT.NONE, 80);
+        column = new Column(DataType.DATE, Messages.ColumnPaymentDate, SWT.NONE, 80);
         column.setLabelProvider(new DateLabelProvider(
                         e -> e instanceof DividendEvent dividendEvent ? dividendEvent.getPaymentDate() : null));
         column.setSorter(ColumnViewerSorter
                         .create(e -> e instanceof DividendEvent dividendEvent ? dividendEvent.getPaymentDate() : null));
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnAmount, SWT.NONE, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnAmount, SWT.NONE, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -150,7 +151,7 @@ public class SecurityEventsPane implements InformationPanePage
                         .create(e -> e instanceof DividendEvent dividendEvent ? dividendEvent.getAmount() : null));
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnDetails, SWT.None, 300);
+        column = new Column(DataType.OTHER_TEXT, Messages.ColumnDetails, SWT.None, 300);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

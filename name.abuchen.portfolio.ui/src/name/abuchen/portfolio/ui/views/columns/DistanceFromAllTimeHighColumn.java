@@ -14,6 +14,7 @@ import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.ReportingPeriod;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.CacheKey;
 import name.abuchen.portfolio.ui.util.viewers.Column;
@@ -63,7 +64,7 @@ public class DistanceFromAllTimeHighColumn extends Column implements Column.Cach
 
     public DistanceFromAllTimeHighColumn(Supplier<LocalDate> dateProvider, List<ReportingPeriod> options)
     {
-        super("distance-from-ath", Messages.ColumnQuoteDistanceFromAthPercent, SWT.RIGHT, 80); //$NON-NLS-1$
+        super("distance-from-ath", DataType.QUOTE_PERCENT, Messages.ColumnQuoteDistanceFromAthPercent, SWT.RIGHT, 80); //$NON-NLS-1$
 
         BiFunction<Object, ReportingPeriod, AllTimeHigh> valueProvider = (element, option) -> {
             Interval interval = option.toInterval(dateProvider.get());

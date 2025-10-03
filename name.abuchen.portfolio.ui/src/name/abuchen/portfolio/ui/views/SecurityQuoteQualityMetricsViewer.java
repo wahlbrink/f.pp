@@ -20,6 +20,7 @@ import org.eclipse.swt.widgets.Label;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.QuoteQualityMetrics;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.Colors;
 import name.abuchen.portfolio.ui.util.FormDataFactory;
@@ -78,7 +79,7 @@ public class SecurityQuoteQualityMetricsViewer
                         SecurityQuoteQualityMetricsViewer.class.getSimpleName() + "@missing", //$NON-NLS-1$
                         preferences, missing, layout);
 
-        Column column = new Column(Messages.ColumnDate, SWT.None, 300);
+        Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 300);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
