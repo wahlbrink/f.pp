@@ -23,16 +23,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import name.abuchen.portfolio.model.Account;
-import name.abuchen.portfolio.model.Attributable;
 import name.abuchen.portfolio.model.InvestmentPlan;
 import name.abuchen.portfolio.model.InvestmentPlan.Type;
-import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.TransactionPair;
 import name.abuchen.portfolio.money.CurrencyConverterImpl;
 import name.abuchen.portfolio.money.ExchangeRateProviderFactory;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.PortfolioPlugin;
@@ -165,38 +163,18 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
         return container;
     }
 
-    private Image maybeGetLogo(Attributable object)
-    {
-        return LogoManager.instance().getDefaultColumnImage(object, getClient().getSettings());
-    }
-
     private void addColumns(ShowHideColumnHelper support)
     {
-        Column column = new NameColumn("0", Messages.ColumnName, SWT.None, 100, part.getClient()); //$NON-NLS-1$
+        Column column = new NameColumn("0", Messages.ColumnName, 100, part.getClient()); //$NON-NLS-1$
         column.getEditingSupport().addListener(this);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnSecurity, SWT.NONE, 250);
-        column.setLabelProvider(new ColumnLabelProvider()
-        {
-            @Override
-            public String getText(Object e)
-            {
-                InvestmentPlan plan = (InvestmentPlan) e;
-                return plan.getSecurity() != null ? plan.getSecurity().getName() : null;
-            }
-
-            @Override
-            public Image getImage(Object e)
-            {
-                InvestmentPlan plan = (InvestmentPlan) e;
-                return maybeGetLogo(plan.getSecurity());
-            }
-        });
-        ColumnViewerSorter.create(Security.class, "name").attachTo(column); //$NON-NLS-1$
+        column = new NameColumn("securityName", //$NON-NLS-1$
+                        (e) -> ((InvestmentPlan) e).getSecurity(),
+                        Messages.ColumnSecurity, 250, getClient() );
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnPortfolio, SWT.None, 120);
+        column = new Column(DataType.NAME, Messages.ColumnPortfolio, SWT.None, 120);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -224,50 +202,35 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
             public Image getImage(Object e)
             {
                 InvestmentPlan plan = (InvestmentPlan) e;
-                return maybeGetLogo(plan.getPortfolio());
+                return LogoManager.instance().getDefaultColumnImage(plan.getPortfolio(), getClient().getSettings());
             }
         });
         ColumnViewerSorter.create(InvestmentPlan.class, "portfolio").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnAccount, SWT.None, 120);
-        column.setLabelProvider(new ColumnLabelProvider()
-        {
-            @Override
-            public String getText(Object e)
-            {
-                InvestmentPlan plan = (InvestmentPlan) e;
-                return plan.getAccount() != null ? plan.getAccount().getName() : Messages.InvestmentPlanOptionDelivery;
-            }
-
-            @Override
-            public Image getImage(Object e)
-            {
-                InvestmentPlan plan = (InvestmentPlan) e;
-                return maybeGetLogo(plan.getAccount());
-            }
-        });
-        ColumnViewerSorter.create(Account.class, "name").attachTo(column); //$NON-NLS-1$
+        column = new NameColumn("accountName", //$NON-NLS-1$
+                        (e) -> ((InvestmentPlan) e).getAccount(),
+                        Messages.ColumnAccount, 120, getClient());
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnStartDate, SWT.None, 80);
+        column = new Column(DataType.DATE, Messages.ColumnStartDate, SWT.None, 80);
         column.setLabelProvider(new DateLabelProvider(e -> ((InvestmentPlan) e).getStart()));
         ColumnViewerSorter.create(InvestmentPlan.class, "start").attachTo(column); //$NON-NLS-1$
         new DateEditingSupport(InvestmentPlan.class, "start").addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnLastDate, SWT.None, 80);
+        column = new Column(DataType.DATE, Messages.ColumnLastDate, SWT.None, 80);
         column.setLabelProvider(new DateLabelProvider(e -> ((InvestmentPlan) e).getLastDate().orElse(null)));
         ColumnViewerSorter.create(InvestmentPlan.class, "LastDate").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnNextDate, SWT.None, 80);
+        column = new Column(DataType.FUTURE_DATE, Messages.ColumnNextDate, SWT.None, 80);
         column.setLabelProvider(
                         new DateLabelProvider(e -> ((InvestmentPlan) e).getDateOfNextTransactionToBeGenerated()));
         ColumnViewerSorter.create(InvestmentPlan.class, "DateOfNextTransactionToBeGenerated").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnInterval, SWT.None, 80);
+        column = new Column(DataType.OTHER_ENUM, Messages.ColumnInterval, SWT.None, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -289,7 +252,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
                         .attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnAmount, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -303,7 +266,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
         new ValueEditingSupport(InvestmentPlan.class, "amount", Values.Amount).addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnFees, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -316,7 +279,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
         ColumnViewerSorter.create(InvestmentPlan.class, "fees").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnTaxes, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -329,7 +292,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
         ColumnViewerSorter.create(InvestmentPlan.class, "taxes").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnAutoGenerate, SWT.LEFT, 80);
+        column = new Column(DataType.OTHER_BOOLEAN, Messages.ColumnAutoGenerate, SWT.LEFT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

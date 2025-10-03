@@ -60,6 +60,7 @@ import name.abuchen.portfolio.snapshot.ClientSnapshot;
 import name.abuchen.portfolio.snapshot.PortfolioSnapshot;
 import name.abuchen.portfolio.snapshot.filter.ClientFilter;
 import name.abuchen.portfolio.snapshot.filter.PortfolioClientFilter;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.dialogs.EditClientFilterDialog.ContentProvider;
@@ -282,22 +283,23 @@ public class GroupedAccountsListView extends AbstractFinanceView implements Modi
         groupedAccountColumns = new ShowHideColumnHelper(GroupedAccountsListView.class.getSimpleName() + "@top", //$NON-NLS-1$
                         getPreferenceStore(), groupedAccounts, layout);
 
-        Column column = new NameColumn("name", Messages.ClientEditorLabelClientMasterData, SWT.None, 200, getClient()); //$NON-NLS-1$
-        column.setLabelProvider(new NameColumnLabelProvider(getClient())
+        Column column = new NameColumn("name", Messages.ClientEditorLabelClientMasterData, 200, //$NON-NLS-1$
+                        new NameColumnLabelProvider(getClient())
         {
             @Override
             public String getText(Object element)
             {
-                return element instanceof ClientFilterMenu.Item item ? item.getLabel() : super.getText(element);
+                return (element instanceof ClientFilterMenu.Item item)
+                                ? item.getLabel()
+                                : super.getText(element);
             }
 
             @Override
             public Image getImage(Object element)
             {
-                if (element instanceof ClientFilterMenu.Item)
-                    return Images.GROUPEDACCOUNTS.image();
-                else
-                    return super.getImage(element);
+                return (element instanceof ClientFilterMenu.Item)
+                                ? Images.GROUPEDACCOUNTS.image()
+                                : super.getImage(element);
             }
         });
         new StringEditingSupport(ClientFilterMenu.Item.class, "label").setMandatory(true) //$NON-NLS-1$
@@ -313,7 +315,7 @@ public class GroupedAccountsListView extends AbstractFinanceView implements Modi
 
         groupedAccountColumns.addColumn(column);
 
-        column = new Column("weight", Messages.ColumnWeight, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("weight", DataType.OTHER_NUMBER, Messages.ColumnWeight, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -328,7 +330,7 @@ public class GroupedAccountsListView extends AbstractFinanceView implements Modi
                                         .addListener(this).attachTo(column);
         groupedAccountColumns.addColumn(column);
 
-        column = new Column("volume", Messages.ColumnBalance, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("volume", DataType.MONEY, Messages.ColumnBalance, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

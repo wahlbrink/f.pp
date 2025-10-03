@@ -24,12 +24,11 @@ import org.eclipse.swt.widgets.Control;
 import name.abuchen.portfolio.model.AccountTransaction;
 import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.PortfolioTransaction;
-import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.Transaction.Unit;
 import name.abuchen.portfolio.model.TransactionPair;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
-import name.abuchen.portfolio.ui.Images;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.AbstractFinanceView;
 import name.abuchen.portfolio.ui.selection.SecuritySelection;
@@ -43,7 +42,8 @@ import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
 import name.abuchen.portfolio.ui.util.viewers.DateTimeLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.SharesLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
-import name.abuchen.portfolio.util.TextUtil;
+import name.abuchen.portfolio.ui.views.columns.NameColumn;
+import name.abuchen.portfolio.ui.views.columns.NoteColumn;
 
 public class TransactionsTab implements PaymentsTab
 {
@@ -124,7 +124,7 @@ public class TransactionsTab implements PaymentsTab
 
     private void addColumns(ShowHideColumnHelper support)
     {
-        Column column = new Column(Messages.ColumnDate, SWT.None, 80);
+        Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 80);
         column.setLabelProvider(new DateTimeLabelProvider(
                         element -> ((TransactionPair<?>) element).getTransaction().getDateTime()));
         ColumnViewerSorter.create(TransactionPair.BY_DATE).attachTo(column, SWT.DOWN);
@@ -137,7 +137,7 @@ public class TransactionsTab implements PaymentsTab
                                         : ((PortfolioTransaction) ((TransactionPair<?>) element).getTransaction())
                                                         .getType().toString();
 
-        column = new Column(Messages.ColumnTransactionType, SWT.LEFT, 80);
+        column = new Column(DataType.TRANSACTION_TYPE, Messages.ColumnTransactionType, SWT.LEFT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -155,30 +155,10 @@ public class TransactionsTab implements PaymentsTab
         ColumnViewerSorter.create(tx2type).attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnSecurity, SWT.None, 250);
-        column.setLabelProvider(new ColumnLabelProvider()
-        {
-            @Override
-            public String getText(Object element)
-            {
-                Security security = ((TransactionPair<?>) element).getTransaction().getSecurity();
-                return security != null ? security.getName() : null;
-            }
-
-            @Override
-            public Image getImage(Object element)
-            {
-                Security security = ((TransactionPair<?>) element).getTransaction().getSecurity();
-                return LogoManager.instance().getDefaultColumnImage(security, model.getClient().getSettings());
-            }
-        });
-        ColumnViewerSorter.createIgnoreCase(e -> {
-            Security s = ((TransactionPair<?>) e).getTransaction().getSecurity();
-            return s != null ? s.getName() : null;
-        }).attachTo(column);
+        column = new NameColumn("securityName", Messages.ColumnSecurity, 250, model.getClient()); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnShares, SWT.RIGHT, 80);
+        column = new Column(DataType.NUM_SHARES, Messages.ColumnShares, SWT.RIGHT, 80);
         column.setLabelProvider(new SharesLabelProvider()
         {
             @Override
@@ -196,7 +176,7 @@ public class TransactionsTab implements PaymentsTab
         ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getShares()).attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnGrossValue, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnGrossValue, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -226,7 +206,7 @@ public class TransactionsTab implements PaymentsTab
                         .attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnTaxes, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -255,7 +235,7 @@ public class TransactionsTab implements PaymentsTab
                         .attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnFees, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -284,7 +264,7 @@ public class TransactionsTab implements PaymentsTab
                         .attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnAmount, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -303,7 +283,7 @@ public class TransactionsTab implements PaymentsTab
         ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getMonetaryAmount()).attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnOffsetAccount, SWT.None, 120);
+        column = new Column(DataType.NAME, Messages.ColumnOffsetAccount, SWT.None, 120);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -322,39 +302,10 @@ public class TransactionsTab implements PaymentsTab
         ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getOwner().toString()).attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnNote, SWT.None, 200);
-        column.setLabelProvider(new ColumnLabelProvider()
-        {
-            private String getRawText(Object element)
-            {
-                return ((TransactionPair<?>) element).getTransaction().getNote();
-            }
-
-            @Override
-            public String getText(Object element)
-            {
-                String note = getRawText(element);
-                return note == null || note.isEmpty() ? null : TextUtil.toSingleLine(note);
-            }
-
-            @Override
-            public Image getImage(Object element)
-            {
-                String note = getRawText(element);
-                return note != null && note.length() > 0 ? Images.NOTE.image() : null;
-            }
-
-            @Override
-            public String getToolTipText(Object e)
-            {
-                String note = getRawText(e);
-                return note == null || note.isEmpty() ? null : TextUtil.wordwrap(note);
-            }
-        });
-        ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getTransaction().getNote()).attachTo(column);
+        column = new NoteColumn(null, false);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnSource, SWT.None, 200);
+        column = new Column(DataType.NAME, Messages.ColumnSource, SWT.None, 200);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

@@ -37,6 +37,7 @@ import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.balance.Balance;
 import name.abuchen.portfolio.snapshot.balance.Balance.Proposal;
 import name.abuchen.portfolio.snapshot.balance.BalanceCollector;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.ClientInput;
 import name.abuchen.portfolio.ui.editor.ClientInputListener;
@@ -209,7 +210,7 @@ public class TroubleshootBalanceDiscrepancyDialog extends Dialog
         ShowHideColumnHelper support = new ShowHideColumnHelper(getClass().getSimpleName() + "-balance@Vxy11", //$NON-NLS-1$
                         clientInput.getPreferenceStore(), balanceViewer, layout);
 
-        Column column = new Column("date", Messages.ColumnDate, SWT.NONE, 100); //$NON-NLS-1$
+        Column column = new Column("date", DataType.DATE, Messages.ColumnDate, SWT.NONE, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -225,7 +226,7 @@ public class TroubleshootBalanceDiscrepancyDialog extends Dialog
         column.setSorter(ColumnViewerSorter.create(element -> ((Balance) element).getDate()), SWT.DOWN);
         support.addColumn(column);
 
-        column = new Column("value", Messages.Balance, SWT.RIGHT, 120); //$NON-NLS-1$
+        column = new Column("value", DataType.MONEY, Messages.Balance, SWT.RIGHT, 120); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -237,7 +238,7 @@ public class TroubleshootBalanceDiscrepancyDialog extends Dialog
         });
         support.addColumn(column);
 
-        column = new Column("delta", Messages.ColumnDiscrepancy, SWT.RIGHT, 120); //$NON-NLS-1$
+        column = new Column("delta", DataType.MONEY, Messages.ColumnDiscrepancy, SWT.RIGHT, 120); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -252,7 +253,7 @@ public class TroubleshootBalanceDiscrepancyDialog extends Dialog
         });
         support.addColumn(column);
 
-        column = new Column("expected", Messages.ColumnExpectedBalance, SWT.RIGHT, 120); //$NON-NLS-1$
+        column = new Column("expected", DataType.MONEY, Messages.ColumnExpectedBalance, SWT.RIGHT, 120); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

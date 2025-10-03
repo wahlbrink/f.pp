@@ -9,6 +9,7 @@ import org.eclipse.swt.SWT;
 import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.model.Transaction;
 import name.abuchen.portfolio.model.TransactionOwner;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
@@ -20,7 +21,7 @@ public class LastTransactionDateColumn extends Column implements Column.CacheInv
 
     public LastTransactionDateColumn()
     {
-        super("last-date", Messages.ColumnLastTransactionDate, SWT.RIGHT, 80); //$NON-NLS-1$
+        super("last-date", DataType.DATE, Messages.ColumnLastTransactionDate, SWT.RIGHT, 80); //$NON-NLS-1$
 
         setLabelProvider(new DateTimeLabelProvider(this::getOrCompute));
         setSorter(ColumnViewerSorter.create(this::getOrCompute));

@@ -1,20 +1,30 @@
 package name.abuchen.portfolio.ui.views.columns;
 
 import java.text.MessageFormat;
+import java.util.function.Function;
 
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.swt.SWT;
 
 import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.model.Security;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport;
+import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.ModificationListener;
 import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.util.Isin;
 
 public class IsinColumn extends Column
 {
+    public static final String DEFAULT_ID = "isin"; //$NON-NLS-1$
+
+    private static final Function<Object, String> DEFAULT_GET_ISIN = (e) -> {
+        Security security = Adaptor.adapt(Security.class, e);
+        return (security != null) ? security.getIsin() : null;
+    };
+
     public static class IsinEditingSupport extends ColumnEditingSupport
     {
         @Override
@@ -52,24 +62,36 @@ public class IsinColumn extends Column
 
     public IsinColumn()
     {
-        this("isin"); //$NON-NLS-1$
+        this(DEFAULT_ID);
     }
 
     public IsinColumn(String id)
     {
-        super(id, Messages.ColumnISIN, SWT.LEFT, 100);
+        this(id, DEFAULT_GET_ISIN);
+        addEditingSupport(null);
+    }
+
+    public IsinColumn(String id, Function<Object, String> getIsin)
+    {
+        super(id, DataType.ISIN, Messages.ColumnISIN, SWT.LEFT, 100);
 
         setLabelProvider(new ColumnLabelProvider()
         {
             @Override
             public String getText(Object e)
             {
-                Security s = Adaptor.adapt(Security.class, e);
-                return s != null ? s.getIsin() : null;
+                return getIsin.apply(e);
             }
         });
-        setSorter(ColumnViewerSorter.create(Security.class, "isin")); //$NON-NLS-1$
-        new IsinEditingSupport().attachTo(this);
+        setSorter(ColumnViewerSorter.createIgnoreCase(getIsin));
+    }
+
+    private void addEditingSupport(ModificationListener listener)
+    {
+        var editingSupport = new IsinEditingSupport();
+        if (listener != null)
+            editingSupport.addListener(listener);
+        editingSupport.attachTo(this);
     }
 
 }

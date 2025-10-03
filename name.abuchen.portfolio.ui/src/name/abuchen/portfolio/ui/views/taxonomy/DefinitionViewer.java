@@ -11,6 +11,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.ColorDialog;
 
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.AbstractFinanceView;
 import name.abuchen.portfolio.ui.util.Colors;
@@ -45,7 +46,7 @@ import name.abuchen.portfolio.util.ColorConversion;
     {
         addDimensionColumn(support);
 
-        Column column = new Column("color", Messages.ColumnColor, SWT.LEFT, 60); //$NON-NLS-1$
+        Column column = new Column("color", DataType.OTHER, Messages.ColumnColor, SWT.LEFT, 60); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

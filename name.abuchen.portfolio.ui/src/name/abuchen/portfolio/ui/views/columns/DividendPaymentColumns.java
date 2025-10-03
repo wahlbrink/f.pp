@@ -14,6 +14,7 @@ import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityEvent.DividendEvent;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.Colors;
 import name.abuchen.portfolio.ui.util.viewers.Column;
@@ -28,7 +29,8 @@ public class DividendPaymentColumns
 
     static Column createNextDividendExDateColumn()
     {
-        Column column = new Column("nextdivexdate", Messages.ColumnDividendsNextExDate, SWT.LEFT, 80); //$NON-NLS-1$
+        Column column = new Column("nextdivexdate", DataType.FUTURE_DATE, Messages.ColumnDividendsNextExDate, SWT.LEFT, //$NON-NLS-1$
+                        80);
         column.setMenuLabel(Messages.ColumnDividendsNextExDate_MenuLabel);
         column.setGroupLabel(Messages.GroupLabelDividends);
         column.setVisible(false);
@@ -64,7 +66,8 @@ public class DividendPaymentColumns
 
     static Column createNextDividendPaymentDateColumn()
     {
-        Column column = new Column("nextdivpaydate", Messages.ColumnDividendsNextPaymentDate, SWT.LEFT, 80); //$NON-NLS-1$
+        Column column = new Column("nextdivpaydate", DataType.FUTURE_DATE, Messages.ColumnDividendsNextPaymentDate, //$NON-NLS-1$
+                        SWT.LEFT, 80);
         column.setMenuLabel(Messages.ColumnDividendsNextPaymentDate_MenuLabel);
         column.setGroupLabel(Messages.GroupLabelDividends);
         column.setVisible(false);
@@ -100,7 +103,8 @@ public class DividendPaymentColumns
 
     static Column createNextDividendPaymentAmount(Client client)
     {
-        Column column = new Column("nextdivpayment", Messages.ColumnDividendsNextPaymentAmount, SWT.RIGHT, 60); //$NON-NLS-1$
+        Column column = new Column("nextdivpayment", DataType.MONEY, Messages.ColumnDividendsNextPaymentAmount, //$NON-NLS-1$
+                        SWT.RIGHT, 60);
         column.setMenuLabel(Messages.ColumnDividendsNextPaymentAmount_MenuLabel);
         column.setGroupLabel(Messages.GroupLabelDividends);
         column.setVisible(false);
