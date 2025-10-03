@@ -40,6 +40,7 @@ import name.abuchen.portfolio.model.SecurityPrice;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.online.Factory;
 import name.abuchen.portfolio.online.QuoteFeed;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.UIConstants;
@@ -336,7 +337,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
 
     private void addColumnLatestPrice()
     {
-        Column column = new Column("last", Messages.ColumnLatest, SWT.RIGHT, 60); //$NON-NLS-1$
+        Column column = new Column("last", DataType.QUOTE, Messages.ColumnLatest, SWT.RIGHT, 60); //$NON-NLS-1$
         column.setMenuLabel(Messages.ColumnLatest_MenuLabel);
         column.setLabelProvider(new ColumnLabelProvider()
         {
@@ -372,7 +373,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
     private void addColumnDateOfLatestPrice()
     {
         Column column;
-        column = new Column("last-date", Messages.ColumnLatestDate, SWT.LEFT, 80); //$NON-NLS-1$
+        column = new Column("last-date", DataType.DATE, Messages.ColumnLatestDate, SWT.LEFT, 80); //$NON-NLS-1$
         column.setMenuLabel(Messages.ColumnLatestDate_MenuLabel);
 
         Function<Object, LocalDate> dataProvider = element -> {
@@ -406,7 +407,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
     {
         var label = MessageFormat.format(Messages.LabelWithQualifier, Messages.ColumnStatus,
                         Messages.EditWizardQuoteFeedTitle);
-        var column = new Column("historic-status", label, SWT.LEFT, 80); //$NON-NLS-1$
+        var column = new Column("historic-status", DataType.OTHER_TEXT, label, SWT.LEFT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.EditWizardQuoteFeedTitle);
         column.setMenuLabel(Messages.ColumnStatus);
         column.setLabelProvider(new ColumnLabelProvider()
@@ -428,7 +429,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
 
         label = MessageFormat.format(Messages.LabelWithQualifier, Messages.ColumnMessage,
                         Messages.EditWizardQuoteFeedTitle);
-        column = new Column("historic-message", label, SWT.LEFT, 80); //$NON-NLS-1$
+        column = new Column("historic-message", DataType.OTHER_TEXT, label, SWT.LEFT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.EditWizardQuoteFeedTitle);
         column.setMenuLabel(Messages.ColumnMessage);
         column.setLabelProvider(ColumnLabelProvider.createTextProvider(
@@ -446,7 +447,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
 
         label = MessageFormat.format(Messages.LabelWithQualifier, Messages.LabelQuoteFeed,
                         Messages.EditWizardQuoteFeedTitle);
-        column = new Column("qf-historic", label, SWT.LEFT, 200); //$NON-NLS-1$
+        column = new Column("qf-historic", DataType.NAME, label, SWT.LEFT, 200); //$NON-NLS-1$
         column.setGroupLabel(Messages.EditWizardQuoteFeedTitle);
         column.setMenuLabel(Messages.LabelQuoteFeed);
         column.setLabelProvider(new ColumnLabelProvider()
@@ -462,7 +463,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
 
         label = MessageFormat.format(Messages.LabelWithQualifier, Messages.EditWizardQuoteFeedLabelFeedURL,
                         Messages.EditWizardQuoteFeedTitle);
-        column = new Column("url-history", label, SWT.LEFT, 200); //$NON-NLS-1$
+        column = new Column("url-history", DataType.OTHER_TEXT, label, SWT.LEFT, 200); //$NON-NLS-1$
         column.setGroupLabel(Messages.EditWizardQuoteFeedTitle);
         column.setMenuLabel(Messages.EditWizardQuoteFeedLabelFeedURL);
         column.setVisible(false);
@@ -483,7 +484,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
     {
         var label = MessageFormat.format(Messages.LabelWithQualifier, Messages.ColumnStatus,
                         Messages.EditWizardLatestQuoteFeedTitle);
-        var column = new Column("status-latest", label, SWT.LEFT, 80); //$NON-NLS-1$
+        var column = new Column("status-latest", DataType.OTHER_TEXT, label, SWT.LEFT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.EditWizardLatestQuoteFeedTitle);
         column.setMenuLabel(Messages.ColumnStatus);
         column.setLabelProvider(new ColumnLabelProvider()
@@ -505,7 +506,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
 
         label = MessageFormat.format(Messages.LabelWithQualifier, Messages.ColumnMessage,
                         Messages.EditWizardLatestQuoteFeedTitle);
-        column = new Column("message-latest", label, SWT.LEFT, 80); //$NON-NLS-1$
+        column = new Column("message-latest", DataType.OTHER_TEXT, label, SWT.LEFT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.EditWizardLatestQuoteFeedTitle);
         column.setMenuLabel(Messages.ColumnMessage);
         column.setLabelProvider(ColumnLabelProvider.createTextProvider(
@@ -524,7 +525,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
 
         label = MessageFormat.format(Messages.LabelWithQualifier, Messages.LabelQuoteFeed,
                         Messages.EditWizardLatestQuoteFeedTitle);
-        column = new Column("qf-latest", label, SWT.LEFT, 200); //$NON-NLS-1$
+        column = new Column("qf-latest", DataType.NAME, label, SWT.LEFT, 200); //$NON-NLS-1$
         column.setGroupLabel(Messages.EditWizardLatestQuoteFeedTitle);
         column.setMenuLabel(Messages.LabelQuoteFeed);
         column.setLabelProvider(new ColumnLabelProvider()
@@ -540,7 +541,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
 
         label = MessageFormat.format(Messages.LabelWithQualifier, Messages.EditWizardQuoteFeedLabelFeedURL,
                         Messages.EditWizardLatestQuoteFeedTitle);
-        column = new Column("url-latest", label, SWT.LEFT, 200); //$NON-NLS-1$
+        column = new Column("url-latest", DataType.OTHER_TEXT, label, SWT.LEFT, 200); //$NON-NLS-1$
         column.setGroupLabel(Messages.EditWizardLatestQuoteFeedTitle);
         column.setMenuLabel(Messages.EditWizardQuoteFeedLabelFeedURL);
         column.setVisible(false);

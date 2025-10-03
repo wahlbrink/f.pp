@@ -13,6 +13,7 @@ import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.ReportingPeriod;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.Colors;
 import name.abuchen.portfolio.ui.util.viewers.Column;
@@ -87,7 +88,7 @@ public class QuoteRangeColumn extends Column
 
     public QuoteRangeColumn(Supplier<LocalDate> dateProvider, List<ReportingPeriod> options)
     {
-        super("range-widget", Messages.ColumnQuoteRangeWidget, SWT.RIGHT, 80); //$NON-NLS-1$
+        super("range-widget", DataType.OTHER_NUMBER, Messages.ColumnQuoteRangeWidget, SWT.RIGHT, 80); //$NON-NLS-1$
 
         BiFunction<Object, ReportingPeriod, AllTimeHigh> valueProvider = (element, option) -> {
             Interval interval = option.toInterval(dateProvider.get());

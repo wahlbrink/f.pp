@@ -70,6 +70,7 @@ import name.abuchen.portfolio.snapshot.security.LazySecurityPerformanceRecord;
 import name.abuchen.portfolio.snapshot.security.LazySecurityPerformanceSnapshot;
 import name.abuchen.portfolio.snapshot.trail.Trail;
 import name.abuchen.portfolio.snapshot.trail.TrailProvider;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.UIConstants;
@@ -835,7 +836,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
     private void createCommonColumns()
     {
         // shares held
-        Column column = new Column("shares", Messages.ColumnSharesOwned, SWT.RIGHT, 80); //$NON-NLS-1$
+        Column column = new Column("shares", DataType.NUM_SHARES, Messages.ColumnSharesOwned, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new SharesLabelProvider() // NOSONAR
         {
             @Override
@@ -856,7 +857,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // latest / current quote
-        column = new Column("quote", Messages.ColumnQuote, SWT.RIGHT, 75); //$NON-NLS-1$
+        column = new Column("quote", DataType.QUOTE, Messages.ColumnQuote, SWT.RIGHT, 75); //$NON-NLS-1$
         column.setDescription(Messages.ColumnQuote_DescriptionEndOfReportingPeriod);
         column.setLabelProvider(new RowElementLabelProvider(new ColumnLabelProvider()
         {
@@ -880,7 +881,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // change to previous day percent value
-        column = new Column("5", Messages.ColumnChangeOnPrevious, SWT.RIGHT, 60); //$NON-NLS-1$
+        column = new Column("5", DataType.QUOTE_PERCENT, Messages.ColumnChangeOnPrevious, SWT.RIGHT, 60); //$NON-NLS-1$
         column.setMenuLabel(Messages.ColumnChangeOnPrevious_MenuLabel);
         column.setLabelProvider(new RowElementLabelProvider(new NumberColorLabelProvider<>(Values.Percent2, element -> {
             Optional<Pair<SecurityPrice, SecurityPrice>> previous = ((LazySecurityPerformanceRecord) element)
@@ -942,7 +943,8 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // change to previous day absolute value
-        column = new Column("changeonpreviousamount", Messages.ColumnChangeOnPreviousAmount, SWT.RIGHT, 60); //$NON-NLS-1$
+        column = new Column("changeonpreviousamount", DataType.QUOTE_DIFF, Messages.ColumnChangeOnPreviousAmount, //$NON-NLS-1$
+                        SWT.RIGHT, 60);
         column.setMenuLabel(Messages.ColumnChangeOnPrevious_MenuLabelAmount);
 
         column.setLabelProvider(
@@ -1009,7 +1011,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // market value
-        column = new Column("mv", Messages.ColumnMarketValue, SWT.RIGHT, 75); //$NON-NLS-1$
+        column = new Column("mv", DataType.MONEY, Messages.ColumnMarketValue, SWT.RIGHT, 75); //$NON-NLS-1$
         column.setLabelProvider(new RowElementLabelProvider(
                         r -> Values.Money.format(r.getMarketValue().get(), getClient().getBaseCurrency()),
                         aggregate -> Values.Money.format(
@@ -1021,7 +1023,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         addPurchaseCostColumns();
 
         // cost value - FIFO
-        column = new Column("pv", Messages.ColumnPurchaseValue, SWT.RIGHT, 75); //$NON-NLS-1$
+        column = new Column("pv", DataType.MONEY, Messages.ColumnPurchaseValue, SWT.RIGHT, 75); //$NON-NLS-1$
         column.setGroupLabel(Messages.ColumnPurchaseValue);
         column.setHeading(Messages.LabelTaxesAndFeesIncluded);
         column.setMenuLabel(Messages.ColumnPurchaseValue_MenuLabel);
@@ -1039,7 +1041,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // cost value - moving average
-        column = new Column("pvmvavg", Messages.ColumnPurchaseValueMovingAverage, SWT.RIGHT, 75); //$NON-NLS-1$
+        column = new Column("pvmvavg", DataType.MONEY, Messages.ColumnPurchaseValueMovingAverage, SWT.RIGHT, 75); //$NON-NLS-1$
         column.setGroupLabel(Messages.ColumnPurchaseValue);
         column.setMenuLabel(Messages.ColumnPurchaseValueMovingAverage_MenuLabel);
         column.setDescription(Messages.ColumnPurchaseValueMovingAverage_Description + TextUtil.PARAGRAPH_BREAK
@@ -1057,7 +1059,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // fees paid
-        column = new Column("fees", Messages.ColumnFees, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("fees", DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setDescription(Messages.ColumnFees_Description);
         column.setLabelProvider(new RowElementLabelProvider(
                         r -> Values.Money.format(r.getFees().get(), getClient().getBaseCurrency()),
@@ -1069,7 +1071,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // taxes paid
-        column = new Column("taxes", Messages.ColumnTaxes, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("taxes", DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new RowElementLabelProvider(
                         r -> Values.Money.format(r.getTaxes().get(), getClient().getBaseCurrency()),
                         aggregate -> Values.Money.format(
@@ -1193,7 +1195,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         column.setSorter(ColumnViewerSorter.create(e -> ((LazySecurityPerformanceRecord) e).getIrr().get()));
         recordColumns.addColumn(column);
 
-        column = new Column("capitalgains", Messages.ColumnCapitalGains, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("capitalgains", DataType.MONEY, Messages.ColumnCapitalGains, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.ColumnCapitalGains_Description);
         column.setLabelProvider(
@@ -1254,7 +1256,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // delta
-        column = new Column("delta", Messages.ColumnAbsolutePerformance, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("delta", DataType.MONEY, Messages.ColumnAbsolutePerformance, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setDescription(Messages.ColumnAbsolutePerformance_Description);
         column.setMenuLabel(Messages.ColumnAbsolutePerformance_MenuLabel);
         column.setGroupLabel(Messages.GroupLabelPerformance);
@@ -1281,7 +1283,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
     private void addCapitalGainsColumns()
     {
         // FIFO
-        Column column = new Column("cg", //$NON-NLS-1$
+        Column column = new Column("cg", DataType.MONEY, //$NON-NLS-1$
                         Messages.ColumnRealizedCapitalGains, SWT.RIGHT, 80);
         column.setHeading(Messages.LabelCapitalGainsMethod + " : " + CostMethod.FIFO.getLabel()); //$NON-NLS-1$
         column.setGroupLabel(Messages.LabelCapitalGains);
@@ -1304,7 +1306,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                         .getRealizedCapitalGains().get().getCapitalGains()));
         recordColumns.addColumn(column);
 
-        column = new Column("cgforex", //$NON-NLS-1$
+        column = new Column("cgforex", DataType.MONEY, //$NON-NLS-1$
                         Messages.ColumnCurrencyGains + " / " + Messages.ColumnRealizedCapitalGains, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.LabelCapitalGains);
         column.setLabelProvider(
@@ -1324,7 +1326,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                         .getRealizedCapitalGains().get().getCapitalGains()));
         recordColumns.addColumn(column);
 
-        column = new Column("ucg", //$NON-NLS-1$
+        column = new Column("ucg", DataType.MONEY, //$NON-NLS-1$
                         Messages.ColumnUnrealizedCapitalGains, SWT.RIGHT, 80);
         column.setGroupLabel(Messages.LabelCapitalGains);
         column.setDescription(Messages.ColumnUnrealizedCapitalGains_Description + TextUtil.PARAGRAPH_BREAK
@@ -1347,7 +1349,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                         .getUnrealizedCapitalGains().get().getCapitalGains()));
         recordColumns.addColumn(column);
 
-        column = new Column("ucgforex", //$NON-NLS-1$
+        column = new Column("ucgforex", DataType.MONEY, //$NON-NLS-1$
                         Messages.ColumnCurrencyGains + " / " + Messages.ColumnUnrealizedCapitalGains, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.LabelCapitalGains);
         column.setLabelProvider(new RowElementLabelProvider(
@@ -1366,7 +1368,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // Moving Average
-        column = new Column("cgMA", //$NON-NLS-1$
+        column = new Column("cgMA", DataType.MONEY, //$NON-NLS-1$
                         Messages.ColumnRealizedCapitalGains + " (" + CostMethod.MOVING_AVERAGE.getAbbreviation() //$NON-NLS-1$
                                         + ")", //$NON-NLS-1$
                         SWT.RIGHT, 80);
@@ -1391,7 +1393,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                         .getRealizedCapitalGainsMovingAvg().get().getCapitalGains()));
         recordColumns.addColumn(column);
 
-        column = new Column("cgforexMA", //$NON-NLS-1$
+        column = new Column("cgforexMA", DataType.MONEY, //$NON-NLS-1$
                         Messages.ColumnCurrencyGains + " / " + Messages.ColumnRealizedCapitalGains + " (" //$NON-NLS-1$ //$NON-NLS-2$
                                         + CostMethod.MOVING_AVERAGE.getAbbreviation() + ")", //$NON-NLS-1$
                         SWT.RIGHT, 80);
@@ -1410,7 +1412,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                         .getRealizedCapitalGainsMovingAvg().get().getCapitalGains()));
         recordColumns.addColumn(column);
 
-        column = new Column("ucgMA", //$NON-NLS-1$
+        column = new Column("ucgMA", DataType.MONEY, //$NON-NLS-1$
                         Messages.ColumnUnrealizedCapitalGains + " (" + CostMethod.MOVING_AVERAGE.getAbbreviation() //$NON-NLS-1$
                                         + ")", //$NON-NLS-1$
                         SWT.RIGHT, 80);
@@ -1434,7 +1436,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                         .getUnrealizedCapitalGainsMovingAvg().get().getCapitalGains()));
         recordColumns.addColumn(column);
 
-        column = new Column("ucgforexMA", //$NON-NLS-1$
+        column = new Column("ucgforexMA", DataType.MONEY, //$NON-NLS-1$
                         Messages.ColumnCurrencyGains + " / " + Messages.ColumnUnrealizedCapitalGains + " (" //$NON-NLS-1$ //$NON-NLS-2$
                                         + CostMethod.MOVING_AVERAGE.getAbbreviation() + ")", //$NON-NLS-1$
                         SWT.RIGHT, 80);
@@ -1458,7 +1460,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
     private void createDividendColumns()
     {
         // Gesamtsumme der erhaltenen Dividenden
-        Column column = new Column("sumdiv", Messages.ColumnDividendSum, SWT.RIGHT, 80); //$NON-NLS-1$
+        Column column = new Column("sumdiv", DataType.MONEY, Messages.ColumnDividendSum, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setMenuLabel(Messages.ColumnDividendSum_MenuLabel);
         column.setGroupLabel(Messages.GroupLabelDividends);
         column.setLabelProvider(new RowElementLabelProvider(
@@ -1597,7 +1599,8 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
 
     private void createForeignCurrencyColumns()
     {
-        Column column = new Column("quoteReportingCurrency", Messages.ColumnQuote + Messages.BaseCurrencyCue, SWT.RIGHT, //$NON-NLS-1$
+        Column column = new Column("quoteReportingCurrency", DataType.QUOTE, //$NON-NLS-1$
+                        Messages.ColumnQuote + Messages.BaseCurrencyCue, SWT.RIGHT, 
                         75);
         column.setGroupLabel(Messages.ColumnForeignCurrencies);
         column.setDescription(Messages.ColumnQuote_DescriptionEndOfReportingPeriod);
@@ -1649,7 +1652,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         var suffix = " [{0}]"; //$NON-NLS-1$
 
         // shares held
-        Column column = new Column("filter:shares", Messages.ColumnSharesOwned, SWT.RIGHT, 80); //$NON-NLS-1$
+        Column column = new Column("filter:shares", DataType.NUM_SHARES, Messages.ColumnSharesOwned, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setOptions(new ClientFilterColumnOptions(Messages.ColumnSharesOwned + suffix,
                         new ClientFilterMenu(getClient(), getPreferenceStore())));
         column.setGroupLabel(Messages.LabelClientFilterMenu);
@@ -1668,7 +1671,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // cost value - fifo
-        column = new Column("filter:pv", Messages.ColumnPurchaseValue, SWT.RIGHT, 75); //$NON-NLS-1$
+        column = new Column("filter:pv", DataType.MONEY, Messages.ColumnPurchaseValue, SWT.RIGHT, 75); //$NON-NLS-1$
         column.setOptions(new ClientFilterColumnOptions(Messages.ColumnPurchaseValue + suffix,
                         new ClientFilterMenu(getClient(), getPreferenceStore())));
         column.setDescription(Messages.ColumnPurchaseValue_Description + TextUtil.PARAGRAPH_BREAK
@@ -1696,7 +1699,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // market value
-        column = new Column("filter:mv", Messages.ColumnMarketValue, SWT.RIGHT, 75); //$NON-NLS-1$
+        column = new Column("filter:mv", DataType.MONEY, Messages.ColumnMarketValue, SWT.RIGHT, 75); //$NON-NLS-1$
         column.setOptions(new ClientFilterColumnOptions(Messages.ColumnMarketValue + suffix,
                         new ClientFilterMenu(getClient(), getPreferenceStore())));
         column.setGroupLabel(Messages.LabelClientFilterMenu);
@@ -1714,7 +1717,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // sum of dividends
-        column = new Column("filter:sumdiv", Messages.ColumnDividendSum, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("filter:sumdiv", DataType.MONEY, Messages.ColumnDividendSum, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setOptions(new ClientFilterColumnOptions(Messages.ColumnDividendSum + suffix,
                         new ClientFilterMenu(getClient(), getPreferenceStore())));
         column.setMenuLabel(Messages.ColumnDividendSum_MenuLabel);
@@ -1733,7 +1736,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // true time weighted rate of return
-        column = new Column("filter:twror", Messages.LabelTTWROR, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("filter:twror", DataType.OTHER_NUMBER, Messages.LabelTTWROR, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setOptions(new ClientFilterColumnOptions(Messages.ColumnTTWROR + suffix,
                         new ClientFilterMenu(getClient(), getPreferenceStore())));
         column.setGroupLabel(Messages.LabelClientFilterMenu);
@@ -1748,7 +1751,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
         recordColumns.addColumn(column);
 
         // internal rate of erturn
-        column = new Column("filter:izf", Messages.ColumnIRR_MenuLabel, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("filter:izf", DataType.OTHER_NUMBER, Messages.ColumnIRR_MenuLabel, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setOptions(new ClientFilterColumnOptions(Messages.ColumnIRR + suffix,
                         new ClientFilterMenu(getClient(), getPreferenceStore())));
         column.setGroupLabel(Messages.LabelClientFilterMenu);
@@ -1792,7 +1795,7 @@ public class SecuritiesPerformanceView extends AbstractFinanceView implements Re
                 return Money.of(marketValue.getCurrencyCode(), Math.round(expected));
             };
 
-            Column column = new Column("filter:expecteddividends", //$NON-NLS-1$
+            Column column = new Column("filter:expecteddividends", DataType.MONEY, //$NON-NLS-1$
                             Messages.ExperimentalColumnExpectedDividends_MenuLabel, SWT.RIGHT, 80);
             column.setOptions(new ClientFilterColumnOptions(Messages.ExperimentalColumnExpectedDividends + suffix,
                             new ClientFilterMenu(getClient(), getPreferenceStore())));
