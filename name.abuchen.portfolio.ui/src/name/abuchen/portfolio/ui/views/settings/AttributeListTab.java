@@ -29,6 +29,7 @@ import name.abuchen.portfolio.model.InvestmentPlan;
 import name.abuchen.portfolio.model.LimitPrice;
 import name.abuchen.portfolio.model.Portfolio;
 import name.abuchen.portfolio.model.Security;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.AbstractFinanceView;
@@ -182,7 +183,7 @@ public class AttributeListTab implements AbstractTabbedView.Tab, ModificationLis
 
     private void addColumns(ShowHideColumnHelper support)
     {
-        Column column = new Column(Messages.ColumnName, SWT.None, 250);
+        Column column = new Column(DataType.NAME, Messages.ColumnName, SWT.None, 250);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -200,7 +201,7 @@ public class AttributeListTab implements AbstractTabbedView.Tab, ModificationLis
         new StringEditingSupport(AttributeType.class, "name").addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnColumnLabel, SWT.None, 150);
+        column = new Column(DataType.NAME, Messages.ColumnColumnLabel, SWT.None, 150);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -212,7 +213,7 @@ public class AttributeListTab implements AbstractTabbedView.Tab, ModificationLis
         new StringEditingSupport(AttributeType.class, "columnLabel").addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnFieldType, SWT.None, 150);
+        column = new Column(DataType.NAME, Messages.ColumnFieldType, SWT.None, 150);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -223,7 +224,7 @@ public class AttributeListTab implements AbstractTabbedView.Tab, ModificationLis
         });
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnSource, SWT.None, 100);
+        column = new Column(DataType.OTHER_TEXT, Messages.ColumnSource, SWT.None, 100);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

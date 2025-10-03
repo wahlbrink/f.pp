@@ -25,6 +25,7 @@ import name.abuchen.portfolio.money.ExchangeRateProvider;
 import name.abuchen.portfolio.money.ExchangeRateProviderFactory;
 import name.abuchen.portfolio.money.ExchangeRateTimeSeries;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.UIConstants;
 import name.abuchen.portfolio.ui.util.Colors;
@@ -106,7 +107,7 @@ public class ExchangeRatesListTab implements AbstractTabbedView.Tab
         ShowHideColumnHelper support = new ShowHideColumnHelper(ExchangeRatesListTab.class.getSimpleName() + "@top2", //$NON-NLS-1$
                         preferences, indeces, layout);
 
-        Column column = new Column(Messages.ColumnBaseCurrency, SWT.None, 80);
+        Column column = new Column(DataType.CURRENCY, Messages.ColumnBaseCurrency, SWT.None, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -119,7 +120,7 @@ public class ExchangeRatesListTab implements AbstractTabbedView.Tab
                         .attachTo(column, SWT.UP);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnTermCurrency, SWT.None, 80);
+        column = new Column(DataType.CURRENCY, Messages.ColumnTermCurrency, SWT.None, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -132,7 +133,7 @@ public class ExchangeRatesListTab implements AbstractTabbedView.Tab
                         .attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnCurrencyProvider, SWT.None, 150);
+        column = new Column(DataType.NAME, Messages.ColumnCurrencyProvider, SWT.None, 150);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -145,7 +146,7 @@ public class ExchangeRatesListTab implements AbstractTabbedView.Tab
         ColumnViewerSorter.create(ExchangeRateTimeSeries.class, "provider").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnDateLatestExchangeRate, SWT.None, 150);
+        column = new Column(DataType.DATE, Messages.ColumnDateLatestExchangeRate, SWT.None, 150);
 
         Function<Object, LocalDate> dataProvider = element -> {
             ExchangeRateTimeSeries series = (ExchangeRateTimeSeries) element;

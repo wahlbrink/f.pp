@@ -30,6 +30,7 @@ import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityPrice;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.dialogs.SecurityPriceDialog;
@@ -111,7 +112,7 @@ public class HistoricalPricesPane implements InformationPanePage
 
         prices.setUseHashlookup(true);
 
-        Column column = new Column(Messages.ColumnDate, SWT.None, 80);
+        Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 80);
         column.setLabelProvider(new DateLabelProvider(e -> ((SecurityPrice) e).getDate())
         {
             @Override
@@ -150,7 +151,7 @@ public class HistoricalPricesPane implements InformationPanePage
                         }).attachTo(column);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnQuote, SWT.RIGHT, 80);
+        column = new Column(DataType.QUOTE, Messages.ColumnQuote, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

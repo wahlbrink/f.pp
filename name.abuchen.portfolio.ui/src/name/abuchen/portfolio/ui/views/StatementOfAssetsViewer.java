@@ -86,6 +86,7 @@ import name.abuchen.portfolio.snapshot.filter.ReadOnlyAccount;
 import name.abuchen.portfolio.snapshot.filter.ReadOnlyPortfolio;
 import name.abuchen.portfolio.snapshot.security.LazySecurityPerformanceRecord;
 import name.abuchen.portfolio.snapshot.security.LazySecurityPerformanceSnapshot;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.UIConstants;
 import name.abuchen.portfolio.ui.dnd.ImportFromFileDropAdapter;
@@ -476,9 +477,8 @@ public class StatementOfAssetsViewer
                         e -> ((Element) e).isSecurity() ? ((Element) e).getSecurityPosition().getShares() : null)));
         support.addColumn(column);
 
-        column = new NameColumn(client, "1"); //$NON-NLS-1$
-        this.nameColumn = column;
-        column.setLabelProvider(new NameColumnLabelProvider(client) // NOSONAR
+        this.nameColumn = column = new NameColumn("1", //$NON-NLS-1$
+                        new NameColumnLabelProvider(client) // NOSONAR
         {
             @Override
             public String getText(Object e)
@@ -575,7 +575,7 @@ public class StatementOfAssetsViewer
         column.setVisible(false);
         support.addColumn(column);
 
-        column = new Column("5", Messages.ColumnMarketValue, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("5", DataType.MONEY, Messages.ColumnMarketValue, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

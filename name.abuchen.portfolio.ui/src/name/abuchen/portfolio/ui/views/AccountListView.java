@@ -34,6 +34,7 @@ import name.abuchen.portfolio.model.Transaction;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.MutableMoney;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.dialogs.balance.TroubleshootBalanceDiscrepancyDialog;
@@ -56,7 +57,6 @@ import name.abuchen.portfolio.ui.views.columns.CurrencyColumn;
 import name.abuchen.portfolio.ui.views.columns.CurrencyColumn.CurrencyEditingSupport;
 import name.abuchen.portfolio.ui.views.columns.LastTransactionDateColumn;
 import name.abuchen.portfolio.ui.views.columns.NameColumn;
-import name.abuchen.portfolio.ui.views.columns.NameColumn.NameColumnLabelProvider;
 import name.abuchen.portfolio.ui.views.columns.NoteColumn;
 import name.abuchen.portfolio.ui.views.panes.AccountBalancePane;
 import name.abuchen.portfolio.ui.views.panes.AccountTransactionsPane;
@@ -245,15 +245,14 @@ public class AccountListView extends AbstractFinanceView implements Modification
 
     private Column defineAccountNameColumn()
     {
-        var column = new NameColumn("0", Messages.ColumnAccount, SWT.None, 150, getClient()); //$NON-NLS-1$
-        column.setLabelProvider(new NameColumnLabelProvider(getClient()));
+        var column = new NameColumn("0", Messages.ColumnAccount, 150, getClient()); //$NON-NLS-1$
         column.getEditingSupport().addListener(this);
         return column;
     }
 
     private Column defineAccountBalanceColumn()
     {
-        var column = new Column("1", Messages.ColumnBalance, SWT.RIGHT, 80); //$NON-NLS-1$
+        var column = new Column("1", DataType.MONEY, Messages.ColumnBalance, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setDescription(Messages.ColumnBalance_Description);
         column.setLabelProvider(new ColumnLabelProvider()
         {

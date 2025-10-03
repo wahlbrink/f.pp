@@ -1,27 +1,43 @@
 package name.abuchen.portfolio.ui.views.columns;
 
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.swt.SWT;
 
 import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.model.InvestmentVehicle;
 import name.abuchen.portfolio.money.CurrencyUnit;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.ListEditingSupport;
 
-import org.eclipse.jface.viewers.ColumnLabelProvider;
-import org.eclipse.swt.SWT;
-
 public class CurrencyColumn extends Column
 {
+
+    public static final String DEFAULT_ID = "currency"; //$NON-NLS-1$
+
+    private static final Function<Object, String> DEFAULT_GET_CODE = (e) -> {
+        InvestmentVehicle investmentVehicle = Adaptor.adapt(InvestmentVehicle.class, e);
+        return (investmentVehicle != null) ? investmentVehicle.getCurrencyCode() : null;
+    };
+
     private static class CurrencyColumnLabelProvider extends ColumnLabelProvider
     {
-        @Override
-        public String getText(Object e)
+        private Function<Object, String> getCurrencyCode;
+
+        public CurrencyColumnLabelProvider(Function<Object, String> getCurrencyCode)
         {
-            InvestmentVehicle n = Adaptor.adapt(InvestmentVehicle.class, e);
-            return n != null ? n.getCurrencyCode() : null;
+            this.getCurrencyCode = getCurrencyCode;
+        }
+
+        @Override
+        public String getText(Object element)
+        {
+            return getCurrencyCode.apply(element);
         }
     }
 
@@ -38,14 +54,15 @@ public class CurrencyColumn extends Column
 
     public CurrencyColumn()
     {
-        this("currency", Messages.ColumnCurrency, SWT.LEFT, 60); //$NON-NLS-1$
+        this(DEFAULT_ID, DEFAULT_GET_CODE, Messages.ColumnCurrency);
     }
 
-    public CurrencyColumn(String id, String label, int style, int defaultWidth)
+    public CurrencyColumn(String id, Function<Object, String> getCurrencyCode, String label)
     {
-        super(id, label, style, defaultWidth);
+        super(id, DataType.CURRENCY, label, SWT.LEFT, 60);
 
-        setLabelProvider(new CurrencyColumnLabelProvider());
-        setSorter(ColumnViewerSorter.create(InvestmentVehicle.class, "currencyCode")); //$NON-NLS-1$
+        setLabelProvider(new CurrencyColumnLabelProvider(getCurrencyCode));
+        setSorter(ColumnViewerSorter.createIgnoreCase(getCurrencyCode));
     }
+
 }

@@ -25,6 +25,7 @@ import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.QuoteQualityMetrics;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.UIConstants;
 import name.abuchen.portfolio.ui.dialogs.SecurityPriceDialog;
@@ -160,7 +161,7 @@ public class HistoricalPricesDataQualityPane implements InformationPanePage
                         SecurityQuoteQualityMetricsViewer.class.getSimpleName() + showHideColumnHelperSuffix,
                         preferences, tableViewer, layout);
 
-        Column column = new Column(Messages.ColumnDate, SWT.None, 300);
+        Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 300);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

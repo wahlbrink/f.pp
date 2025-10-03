@@ -55,6 +55,7 @@ import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.CurrencyConverter;
 import name.abuchen.portfolio.money.ExchangeRate;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.UIConstants;
@@ -482,8 +483,8 @@ import name.abuchen.portfolio.util.TextUtil;
 
     protected void addDimensionColumn(ShowHideColumnHelper support)
     {
-        Column column = new NameColumn("txname", Messages.ColumnLevels, SWT.NONE, 400, part.getClient()); //$NON-NLS-1$
-        column.setLabelProvider(new NameColumnLabelProvider(part.getClient()) // NOSONAR
+        Column column = new NameColumn("txname", Messages.ColumnLevels, 400, //$NON-NLS-1$
+                        new NameColumnLabelProvider(part.getClient()) // NOSONAR
         {
             @Override
             public Image getImage(Object e)
@@ -524,7 +525,7 @@ import name.abuchen.portfolio.util.TextUtil;
         column.setSorter(null);
         support.addColumn(column);
 
-        column = new Column("classificationKey", Messages.ColumnCategoryKey, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("classificationKey", DataType.OTHER_TEXT, Messages.ColumnCategoryKey, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider() // NOSONAR
         {
             @Override
@@ -567,7 +568,7 @@ import name.abuchen.portfolio.util.TextUtil;
     private void addWeightColumn(ShowHideColumnHelper support) // NOSONAR
     {
         Column column;
-        column = new Column("weight", Messages.ColumnWeight, SWT.RIGHT, 70); //$NON-NLS-1$
+        column = new Column("weight", DataType.OTHER_NUMBER, Messages.ColumnWeight, SWT.RIGHT, 70); //$NON-NLS-1$
         column.setDescription(Messages.ColumnWeight_Description);
         column.setLabelProvider(new ColumnLabelProvider() // NOSONAR
         {
@@ -618,7 +619,7 @@ import name.abuchen.portfolio.util.TextUtil;
 
     protected void addActualColumns(ShowHideColumnHelper support)
     {
-        Column column = new Column("act%", Messages.ColumnActualPercent, SWT.RIGHT, 60); //$NON-NLS-1$
+        Column column = new Column("act%", DataType.OTHER_NUMBER, Messages.ColumnActualPercent, SWT.RIGHT, 60); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -641,7 +642,7 @@ import name.abuchen.portfolio.util.TextUtil;
 
         // Column which shows percentage of this asset class in relationship to
         // total assets
-        column = new Column("amGV%", Messages.ColumnPctOfTotal, SWT.RIGHT, 60); //$NON-NLS-1$
+        column = new Column("amGV%", DataType.OTHER_NUMBER, Messages.ColumnPctOfTotal, SWT.RIGHT, 60); //$NON-NLS-1$
         column.setMenuLabel(Messages.ColumnPctOfTotal_MenuLabel);
         column.setLabelProvider(new ColumnLabelProvider()
         {
@@ -662,7 +663,7 @@ import name.abuchen.portfolio.util.TextUtil;
         });
         support.addColumn(column);
 
-        column = new Column("act", Messages.ColumnActualValue, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("act", DataType.MONEY, Messages.ColumnActualValue, SWT.RIGHT, 100); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -677,7 +678,7 @@ import name.abuchen.portfolio.util.TextUtil;
 
     protected void addAdditionalColumns(ShowHideColumnHelper support) // NOSONAR
     {
-        Column column = new Column("exchangeRate", Messages.ColumnExchangeRate, SWT.RIGHT, 80); //$NON-NLS-1$
+        Column column = new Column("exchangeRate", DataType.OTHER_NUMBER, Messages.ColumnExchangeRate, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.ColumnForeignCurrencies);
         column.setLabelProvider(new ColumnLabelProvider() // NOSONAR
         {
@@ -717,7 +718,8 @@ import name.abuchen.portfolio.util.TextUtil;
         column.setVisible(false);
         support.addColumn(column);
 
-        column = new Column("actBaseCurrency", Messages.ColumnActualValue + Messages.BaseCurrencyCue, SWT.RIGHT, 100); //$NON-NLS-1$
+        column = new Column("actBaseCurrency", DataType.MONEY, Messages.ColumnActualValue + Messages.BaseCurrencyCue, //$NON-NLS-1$
+                        SWT.RIGHT, 100);
         column.setDescription(Messages.ColumnActualValueBaseCurrency);
         column.setGroupLabel(Messages.ColumnForeignCurrencies);
         column.setLabelProvider(new ColumnLabelProvider() // NOSONAR
