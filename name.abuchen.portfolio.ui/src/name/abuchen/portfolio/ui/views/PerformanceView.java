@@ -3,7 +3,6 @@ package name.abuchen.portfolio.ui.views;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.function.Function;
 
 import jakarta.inject.Inject;
 
@@ -54,6 +53,7 @@ import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.ClientPerformanceSnapshot;
 import name.abuchen.portfolio.snapshot.GroupEarningsByAccount;
 import name.abuchen.portfolio.snapshot.filter.WithoutTaxesFilter;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.UIConstants;
@@ -77,6 +77,7 @@ import name.abuchen.portfolio.ui.util.viewers.DateTimeLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
 import name.abuchen.portfolio.ui.util.viewers.ToolTipCustomProviderSupport;
 import name.abuchen.portfolio.ui.views.columns.NameColumn;
+import name.abuchen.portfolio.ui.views.columns.NameColumn.NameColumnLabelProvider;
 import name.abuchen.portfolio.ui.views.columns.NoteColumn;
 import name.abuchen.portfolio.ui.views.panes.HistoricalPricesPane;
 import name.abuchen.portfolio.ui.views.panes.InformationPanePage;
@@ -286,8 +287,8 @@ public class PerformanceView extends AbstractHistoricView
         ShowHideColumnHelper support = new ShowHideColumnHelper(getClass().getSimpleName() + "-calculation@v2", //$NON-NLS-1$
                         getPreferenceStore(), calculation, layout);
 
-        Column column = new NameColumn("label", Messages.ColumnLabel, SWT.NONE, 350, getClient()); //$NON-NLS-1$
-        column.setLabelProvider(new ColumnLabelProvider()
+        Column column = new NameColumn("label", Messages.ColumnLabel, 350, //$NON-NLS-1$
+                        new ColumnLabelProvider()
         {
             @Override
             public String getText(Object element)
@@ -340,7 +341,7 @@ public class PerformanceView extends AbstractHistoricView
         column.getEditingSupport().addListener(new MarkDirtyClientListener(getClient()));
         support.addColumn(column);
 
-        column = new Column("value", Messages.ColumnValue, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("value", DataType.MONEY, Messages.ColumnValue, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -376,7 +377,7 @@ public class PerformanceView extends AbstractHistoricView
         }));
         support.addColumn(column);
 
-        column = new Column("forex", Messages.ColumnThereofForeignCurrencyGains, SWT.RIGHT, 80); //$NON-NLS-1$
+        column = new Column("forex", DataType.MONEY, Messages.ColumnThereofForeignCurrencyGains, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -492,7 +493,7 @@ public class PerformanceView extends AbstractHistoricView
         ShowHideColumnHelper support = new ShowHideColumnHelper(PerformanceView.class.getSimpleName() + "@2" + title, //$NON-NLS-1$
                         getPreferenceStore(), transactionViewer, layout);
 
-        Column column = new Column(Messages.ColumnDate, SWT.None, 100);
+        Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 100);
         column.setLabelProvider(new DateTimeLabelProvider(e -> ((TransactionPair<?>) e).getTransaction().getDateTime())
         {
             @Override
@@ -504,7 +505,7 @@ public class PerformanceView extends AbstractHistoricView
         column.setSorter(ColumnViewerSorter.create(TransactionPair.BY_DATE), SWT.DOWN);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnTransactionType, SWT.LEFT, 100);
+        column = new Column(DataType.TRANSACTION_TYPE, Messages.ColumnTransactionType, SWT.LEFT, 100);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -528,7 +529,7 @@ public class PerformanceView extends AbstractHistoricView
         }));
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnAmount, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -553,11 +554,10 @@ public class PerformanceView extends AbstractHistoricView
         addPortfolioColumn(support);
         addAccountColumn(support);
 
-        column = new NoteColumn();
-        column.setEditingSupport(null);
+        column = new NoteColumn(NoteColumn.DEFAULT_ID, false);
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnSource, SWT.LEFT, 200);
+        column = new Column(DataType.OTHER_TEXT, Messages.ColumnSource, SWT.LEFT, 200);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -591,7 +591,7 @@ public class PerformanceView extends AbstractHistoricView
 
     private void addTaxesColumn(ShowHideColumnHelper support)
     {
-        Column column = new Column(Messages.ColumnTaxes, SWT.RIGHT, 80);
+        Column column = new Column(DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -628,7 +628,7 @@ public class PerformanceView extends AbstractHistoricView
 
     private void addFeesColumn(ShowHideColumnHelper support)
     {
-        Column column = new Column(Messages.ColumnFees, SWT.RIGHT, 80);
+        Column column = new Column(DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -666,124 +666,61 @@ public class PerformanceView extends AbstractHistoricView
 
     private void addSecurityColumn(ShowHideColumnHelper support)
     {
-        Column column = new Column(Messages.ColumnSecurity, SWT.LEFT, 250);
-        column.setLabelProvider(new ColumnLabelProvider()
+        Column column = new NameColumn("securityName", Messages.ColumnSecurity, 250, //$NON-NLS-1$
+                        new NameColumnLabelProvider(getClient())
         {
-            @Override
-            public String getText(Object element)
-            {
-                Security security = ((TransactionPair<?>) element).getTransaction().getSecurity();
-                return security != null ? security.getName() : null;
-            }
-
-            @Override
-            public Image getImage(Object element)
-            {
-                Security security = ((TransactionPair<?>) element).getTransaction().getSecurity();
-                return security != null
-                                ? LogoManager.instance().getDefaultColumnImage(security, getClient().getSettings())
-                                : null;
-            }
-
             @Override
             public Color getForeground(Object element)
             {
                 return colorFor(element);
             }
-        });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(e -> {
-            Security security = ((TransactionPair<?>) e).getTransaction().getSecurity();
-            return security != null ? security.getName() : null;
-        }));
+        }, false);
         support.addColumn(column);
     }
 
     private void addPortfolioColumn(ShowHideColumnHelper support)
     {
-        Column column = new Column(Messages.ColumnPortfolio, SWT.LEFT, 100);
-        column.setLabelProvider(new ColumnLabelProvider()
+        Column column = new NameColumn("portfolioName", //$NON-NLS-1$
+                        (e) -> {
+                            TransactionPair<?> pair = (TransactionPair<?>) e;
+                            return (pair.getOwner() instanceof Portfolio portfolio) ? portfolio : null;
+                        },
+                        Messages.ColumnPortfolio, 100,
+                        new NameColumnLabelProvider(getClient())
         {
-            @Override
-            public String getText(Object element)
-            {
-                Portfolio portfolio = ((TransactionPair<?>) element).getOwner() instanceof Portfolio
-                                ? (Portfolio) ((TransactionPair<?>) element).getOwner()
-                                : null;
-                return portfolio != null ? portfolio.getName() : null;
-            }
-
-            @Override
-            public Image getImage(Object element)
-            {
-                Portfolio portfolio = ((TransactionPair<?>) element).getOwner() instanceof Portfolio
-                                ? (Portfolio) ((TransactionPair<?>) element).getOwner()
-                                : null;
-                return portfolio != null
-                                ? LogoManager.instance().getDefaultColumnImage(portfolio, getClient().getSettings())
-                                : null;
-            }
-
             @Override
             public Color getForeground(Object element)
             {
                 return colorFor(element);
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(e -> {
-            Portfolio portfolio = ((TransactionPair<?>) e).getOwner() instanceof Portfolio
-                            ? (Portfolio) ((TransactionPair<?>) e).getOwner()
-                            : null;
-            return portfolio != null ? portfolio.getName() : null;
-        }));
         support.addColumn(column);
     }
 
     private void addAccountColumn(ShowHideColumnHelper support)
     {
-        Column column = new Column(Messages.ColumnAccount, SWT.LEFT, 100);
+        Column column = new NameColumn("accountName", //$NON-NLS-1$
+                        (e) -> {
+                            TransactionPair<?> pair = (TransactionPair<?>) e;
 
-        Function<Object, Account> getAccount = element -> {
-            TransactionPair<?> pair = (TransactionPair<?>) element;
+                            if (pair.getOwner() instanceof Account account)
+                                return account;
 
-            if (pair.getOwner() instanceof Account)
-                return (Account) pair.getOwner();
-
-            CrossEntry crossEntry = pair.getTransaction().getCrossEntry();
-            if (crossEntry == null)
-                return null;
-
-            TransactionOwner<?> other = crossEntry.getCrossOwner(pair.getTransaction());
-            return other instanceof Account account ? account : null;
-        };
-
-        column.setLabelProvider(new ColumnLabelProvider()
+                            CrossEntry crossEntry = pair.getTransaction().getCrossEntry();
+                            if (crossEntry == null)
+                                return null;
+                            TransactionOwner<?> other = crossEntry.getCrossOwner(pair.getTransaction());
+                            return other instanceof Account account ? account : null;
+                        },
+                        Messages.ColumnAccount, 100,
+                        new NameColumnLabelProvider(getClient())
         {
-            @Override
-            public String getText(Object element)
-            {
-                Account account = getAccount.apply(element);
-                return account != null ? account.getName() : null;
-            }
-
-            @Override
-            public Image getImage(Object element)
-            {
-                Account account = getAccount.apply(element);
-                return account != null
-                                ? LogoManager.instance().getDefaultColumnImage(account, getClient().getSettings())
-                                : null;
-            }
-
             @Override
             public Color getForeground(Object element)
             {
                 return colorFor(element);
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(e -> {
-            Account account = getAccount.apply(e);
-            return account != null ? account.getName() : null;
-        }));
         support.addColumn(column);
     }
 
@@ -800,27 +737,12 @@ public class PerformanceView extends AbstractHistoricView
         ShowHideColumnHelper support = new ShowHideColumnHelper(PerformanceView.class.getSimpleName() + "@byaccounts2", //$NON-NLS-1$
                         getPreferenceStore(), earningsByAccount, layout);
 
-        Column column = new Column(Messages.ColumnSource, SWT.LEFT, 400);
-        column.setLabelProvider(new ColumnLabelProvider()
-        {
-            @Override
-            public String getText(Object element)
-            {
-                GroupEarningsByAccount.Item item = (GroupEarningsByAccount.Item) element;
-                return item.getAccount().getName();
-            }
-
-            @Override
-            public Image getImage(Object element)
-            {
-                GroupEarningsByAccount.Item item = (GroupEarningsByAccount.Item) element;
-                return LogoManager.instance().getDefaultColumnImage(item.getAccount(), getClient().getSettings());
-            }
-        });
-        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "account")); //$NON-NLS-1$
+        Column column = new NameColumn("accountName", //$NON-NLS-1$
+                        (e) -> ((GroupEarningsByAccount.Item) e).getAccount(),
+                        Messages.ColumnSource, 300, getClient());
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnDividendPayment, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnDividendPayment, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -833,7 +755,7 @@ public class PerformanceView extends AbstractHistoricView
         column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "dividends")); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnInterest, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnInterest, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -846,7 +768,7 @@ public class PerformanceView extends AbstractHistoricView
         column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "interest")); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnEarnings, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnEarnings, SWT.RIGHT, 80);
         column.setDescription(Messages.ColumnEarnings_Description);
         column.setLabelProvider(new ColumnLabelProvider()
         {
@@ -860,7 +782,7 @@ public class PerformanceView extends AbstractHistoricView
         column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "sum")); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnFees, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override
@@ -873,7 +795,7 @@ public class PerformanceView extends AbstractHistoricView
         column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "fees")); //$NON-NLS-1$
         support.addColumn(column);
 
-        column = new Column(Messages.ColumnTaxes, SWT.RIGHT, 80);
+        column = new Column(DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80);
         column.setLabelProvider(new ColumnLabelProvider()
         {
             @Override

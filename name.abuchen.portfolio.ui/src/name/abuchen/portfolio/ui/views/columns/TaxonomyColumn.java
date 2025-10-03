@@ -13,6 +13,7 @@ import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.model.Classification;
 import name.abuchen.portfolio.model.InvestmentVehicle;
 import name.abuchen.portfolio.model.Taxonomy;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
@@ -144,7 +145,7 @@ public class TaxonomyColumn extends Column
 
     public TaxonomyColumn(final Taxonomy taxonomy)
     {
-        super(taxonomy.getId(), taxonomy.getName(), SWT.LEFT, 120);
+        super(taxonomy.getId(), DataType.NAME, taxonomy.getName(), SWT.LEFT, 120);
 
         TaxonomyLabelProvider labelProvider = new TaxonomyLabelProvider(taxonomy);
 
