@@ -183,7 +183,7 @@ public class SecurityTransactionDialog extends AbstractTransactionDialog // NOSO
         forexTaxes.bindCurrency(Properties.securityCurrencyCode.name());
 
         Input taxes = new Input(editArea, sign() + Messages.ColumnTaxes);
-        taxes.bindValue(Properties.taxes.name(), Messages.ColumnTaxes, Values.Amount, false);
+        taxes.bindValue(Properties.taxes.name(), Messages.ColumnTaxes, Values.Amount, false, true);
         taxes.bindCurrency(Properties.transactionCurrencyCode.name());
 
         // total
