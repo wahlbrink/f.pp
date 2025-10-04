@@ -92,9 +92,10 @@ public abstract class AbstractTransactionDialog extends TitleAreaDialog
             currency = new Label(editArea, SWT.NONE);
         }
 
-        public void bindValue(String property, String description, Values<?> values, boolean isMandatory)
+        public void bindValue(String property, String description, Values<?> values, boolean isMandatory,
+                        boolean acceptNegativeValues)
         {
-            StringToCurrencyConverter converter = new StringToCurrencyConverter(values);
+            StringToCurrencyConverter converter = new StringToCurrencyConverter(values, acceptNegativeValues);
             UpdateValueStrategy<String, Long> strategy = new UpdateValueStrategy<>();
             strategy.setAfterGetValidator(converter);
             strategy.setConverter(converter);
@@ -112,6 +113,11 @@ public abstract class AbstractTransactionDialog extends TitleAreaDialog
 
             context.bindValue(targetObservable, modelObservable, strategy, new UpdateValueStrategy<Long, String>()
                             .setConverter(new CurrencyToStringConverter(values)));
+        }
+
+        public void bindValue(String property, String description, Values<?> values, boolean isMandatory)
+        {
+            bindValue(property, description, values, isMandatory, false);
         }
 
         public void bindCurrency(String property)
