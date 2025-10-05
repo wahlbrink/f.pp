@@ -15,12 +15,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.swt.widgets.Display;
 
@@ -146,13 +144,7 @@ public class UpdatePricesJob extends AbstractClientJob
         PriceUpdateProgress.getInstance().setLatestJob(getClient(), this);
         fireSnapshot(request);
 
-        // group tasks by grouping criterion and sort biggest groups first
-
-        var groups = tasks.stream().collect(Collectors.groupingBy(t -> t.groupingCriterion)).entrySet().stream()
-                        .sorted(Comparator.comparingInt(e -> -e.getValue().size())).toList();
-
-        var jobs = groups.stream().map(group -> new RunTaskGroupJob(group.getKey(), group.getValue(), request))
-                        .toList();
+        TaskManager taskManager = new TaskManager(tasks);
 
         // start periodic UI updates
         ScheduledFuture<?> periodicUpdate = scheduler.scheduleAtFixedRate(() -> {
@@ -161,9 +153,11 @@ public class UpdatePricesJob extends AbstractClientJob
                 request.getClient().markDirty();
         }, 0, UI_PROGRESS_UPDATE_INTERVAL, TimeUnit.MILLISECONDS);
 
-        JobGroup jobGroup = new JobGroup(Messages.JobLabelUpdating, 10, jobs.size());
-        for (Job job : jobs)
+        int numWorker = Math.min(10, taskManager.getMaxParallel());
+        JobGroup jobGroup = new JobGroup(Messages.JobLabelUpdating, numWorker, numWorker);
+        for (int i = 0; i < numWorker; i++)
         {
+            var job = new RunTaskGroupJob("QuoteUpdater #" + (i + 1), taskManager, request); //$NON-NLS-1$
             job.setJobGroup(jobGroup);
             job.schedule();
         }
