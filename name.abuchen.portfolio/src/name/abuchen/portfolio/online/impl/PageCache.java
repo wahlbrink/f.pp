@@ -1,47 +1,46 @@
 package name.abuchen.portfolio.online.impl;
 
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.SequencedMap;
 
 /* package */ class PageCache<T>
 {
     private static class PageEntry<T>
     {
-        long ts;
-        T answer;
+        final long ts;
+        final T answer;
 
         public PageEntry(T prices)
         {
-            this.ts = System.currentTimeMillis();
+            this.ts = System.nanoTime();
             this.answer = prices;
         }
     }
 
-    private static final int CACHE_SIZE = 50;
-
     private final long expirationTime;
 
-    private HashMap<String, PageEntry<T>> map = new LinkedHashMap<String, PageEntry<T>>()
+    private SequencedMap<String, PageEntry<T>> map = new LinkedHashMap<String, PageEntry<T>>()
     {
         private static final long serialVersionUID = 1L;
 
         @Override
         protected boolean removeEldestEntry(Map.Entry<String, PageEntry<T>> eldest)
         {
-            return size() >= CACHE_SIZE;
+            PageEntry<T> entry = eldest.getValue();
+            return (entry == null || System.nanoTime() - entry.ts > expirationTime);
         }
     };
 
     public PageCache()
     {
-        this.expirationTime = Duration.ofMinutes(5).toMillis();
+        this.expirationTime = Duration.ofMinutes(5).toNanos();
     }
 
     public PageCache(Duration expirationTime)
     {
-        this.expirationTime = expirationTime.toMillis();
+        this.expirationTime = expirationTime.toNanos();
     }
 
     /**
@@ -52,28 +51,12 @@ import java.util.Map;
     public synchronized T lookup(String url)
     {
         PageEntry<T> entry = map.get(url);
-
-        if (entry == null)
-            return null; // NOSONAR
-
-        if (entry.ts < System.currentTimeMillis() - expirationTime)
-        {
-            map.remove(url);
-            return null; // NOSONAR
-        }
-        else
-        {
-            return entry.answer;
-        }
+        return (entry == null || System.nanoTime() - entry.ts > expirationTime) ? null : entry.answer;
     }
 
     public synchronized void put(String url, T prices)
     {
-        map.put(url, new PageEntry<>(prices));
+        map.putFirst(url, new PageEntry<>(prices));
     }
 
-    public synchronized void computeIfAbsent(String url, T prices)
-    {
-        map.computeIfAbsent(url, key -> new PageEntry<>(prices));
-    }
 }
