@@ -25,7 +25,7 @@ public class DivvyDiaryDividendFeed implements DividendFeed
     private String apiKey;
 
     @VisibleForTesting
-    PageCache<String> cache = new PageCache<>();
+    PageCache<JSONArray> cache = new PageCache<>();
 
     public void setApiKey(String apiKey)
     {
@@ -39,34 +39,36 @@ public class DivvyDiaryDividendFeed implements DividendFeed
         if (apiKey == null)
             return Collections.emptyList();
 
-        if (Strings.isNullOrEmpty(security.getIsin()))
+        String isin = security.getIsin();
+        if (Strings.isNullOrEmpty(isin))
             return Collections.emptyList();
 
-        String json = cache.lookup(security.getIsin());
-        if (json == null)
+        JSONArray dividends = cache.lookup(isin);
+        if (dividends == null)
         {
-            json = createWebAccess("api.divvydiary.com", "/symbols/" + security.getIsin()) //$NON-NLS-1$ //$NON-NLS-2$
+            String json = createWebAccess("api.divvydiary.com", "/symbols/" + isin) //$NON-NLS-1$ //$NON-NLS-2$
                             .addHeader("X-API-Key", apiKey) //$NON-NLS-1$
                             .addUserAgent("PortfolioPerformance/" //$NON-NLS-1$
                                             + FrameworkUtil.getBundle(DivvyDiaryDividendFeed.class).getVersion()
                                                             .toString())
                             .get();
-        }
 
-        JSONObject jsonObject = (JSONObject) JSONValue.parse(json);
-        if (jsonObject == null)
-        {
-            throw new IOException("server returned data that doesn't seem to be JSON"); //$NON-NLS-1$
-        }
+            JSONObject jsonObject = (JSONObject) JSONValue.parse(json);
+            if (jsonObject == null)
+            {
+                throw new IOException("server returned data that doesn't seem to be JSON"); //$NON-NLS-1$
+            }
 
-        JSONArray dividends = (JSONArray) jsonObject.get("dividends"); //$NON-NLS-1$
-        if (dividends == null)
-        {
-            throw new IOException("server returned an unexpected JSON-format"); //$NON-NLS-1$
+            dividends = (JSONArray) jsonObject.get("dividends"); //$NON-NLS-1$
+            if (dividends == null)
+            {
+                throw new IOException("server returned an unexpected JSON-format"); //$NON-NLS-1$
+            }
+
+            cache.put(isin, dividends);
         }
 
         List<DividendEvent> answer = new ArrayList<>();
-
         dividends.forEach(entry -> {
             JSONObject row = (JSONObject) entry;
 
@@ -81,11 +83,6 @@ public class DivvyDiaryDividendFeed implements DividendFeed
 
             answer.add(payment);
         });
-
-        // add it to the cache only if it was successfully parsed, otherwise we
-        // might cache invalid data
-        cache.computeIfAbsent(security.getIsin(), json);
-
         return answer;
     }
 
