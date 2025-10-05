@@ -53,6 +53,14 @@ import name.abuchen.portfolio.util.WebAccess.WebAccessException;
 
 public class HTMLTableQuoteFeed implements QuoteFeed
 {
+    private static String getLatestURL(Security security)
+    {
+        // if latestFeed is null, then the policy is 'use same configuration
+        // as historic quotes'
+        String latestFeed = security.getLatestFeed();
+        return latestFeed != null && !latestFeed.isEmpty() ? security.getLatestFeedURL() : security.getFeedURL();
+    }
+
     private static class ExtractedPrice extends LatestSecurityPrice
     {
         private LocalTime time;
@@ -379,8 +387,7 @@ public class HTMLTableQuoteFeed implements QuoteFeed
     @Override
     public String getLatestGroupingCriterion(Security security)
     {
-        String latestFeed = security.getLatestFeed();
-        return getCriterionFrom(latestFeed != null && !latestFeed.isEmpty() ? latestFeed : security.getFeedURL());
+        return getCriterionFrom(getLatestURL(security));
     }
 
     @Override
@@ -393,11 +400,7 @@ public class HTMLTableQuoteFeed implements QuoteFeed
     @Override
     public Optional<LatestSecurityPrice> getLatestQuote(Security security)
     {
-        // if latestFeed is null, then the policy is 'use same configuration
-        // as historic quotes'
-        String feedURL = security.getLatestFeed() == null ? security.getFeedURL() : security.getLatestFeedURL();
-
-        QuoteFeedData data = internalGetQuotes(security, feedURL, false, false);
+        QuoteFeedData data = internalGetQuotes(security, getLatestURL(security), false, false);
 
         if (!data.getErrors().isEmpty())
             PortfolioLog.abbreviated(data.getErrors());
