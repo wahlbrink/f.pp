@@ -131,6 +131,8 @@ abstract class Task
     protected final FeedUpdateStatus status;
     protected final Security security;
 
+    protected long duration = -1;
+
     protected Task(String groupingCriterion, QuoteFeed feed, FeedUpdateStatus status, Security security)
     {
         this.groupingCriterion = groupingCriterion;
