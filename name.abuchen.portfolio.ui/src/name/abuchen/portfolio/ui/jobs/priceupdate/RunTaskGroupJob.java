@@ -1,8 +1,6 @@
 package name.abuchen.portfolio.ui.jobs.priceupdate;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -17,40 +15,47 @@ import name.abuchen.portfolio.ui.PortfolioPlugin;
 
 /* package */ final class RunTaskGroupJob extends Job
 {
-    private final List<Task> tasks;
+    private final TaskManager tasks;
     private final PriceUpdateRequest request;
 
-    RunTaskGroupJob(String groupingCriterion, List<Task> tasks, PriceUpdateRequest request)
+    RunTaskGroupJob(String name, TaskManager tasks, PriceUpdateRequest request)
     {
-        super(groupingCriterion);
+        super(name);
         this.tasks = tasks;
         this.request = request;
 
-        setRule(new GroupingCriterionSchedulingRule(groupingCriterion));
+        // setRule(new GroupingCriterionSchedulingRule(name));
     }
 
     @Override
     protected IStatus run(IProgressMonitor monitor)
     {
-        // create a mutable copy
-        var candidates = new ArrayList<Task>(tasks);
-
-        // number of attempts before failing permanently
-
-        // this is not 100% correct because the list of tasks could contain
-        // different feeds. However, for now only CoinGecko has a different
-        // number of attempts and CoinGecko is grouped into one list
-        int maxAttempts = tasks.getFirst().getFeed().getMaxRateLimitAttempts();
-
-        while (!candidates.isEmpty())
+        Task task = null;
+        boolean retry = false;
+        while (true)
         {
-            var task = candidates.removeFirst();
+            if (retry)
+                retry = false;
+            else
+                task = tasks.pollTask(this, task);
+
+            if (task == null)
+                return Status.OK_STATUS;
 
             task.status.setStatus(UpdateStatus.LOADING, null);
 
             try
             {
-                var status = task.update();
+                long startTime = System.nanoTime();
+                UpdateStatus status;
+                try
+                {
+                    status = task.update();
+                }
+                finally
+                {
+                    task.duration = System.nanoTime() - startTime;
+                }
 
                 task.status.setStatus(status, null);
 
@@ -62,11 +67,7 @@ import name.abuchen.portfolio.ui.PortfolioPlugin;
             catch (AuthenticationExpiredException e)
             {
                 task.status.setStatus(UpdateStatus.ERROR, Messages.MsgAuthenticationExpired);
-                for (var c : candidates)
-                    c.status.setStatus(UpdateStatus.ERROR, Messages.MsgAuthenticationExpired);
-
-                // stop processing further tasks
-                return Status.OK_STATUS;
+                tasks.setGroupError(this, (security) -> Messages.MsgAuthenticationExpired);
             }
             catch (FeedConfigurationException e)
             {
@@ -78,15 +79,13 @@ import name.abuchen.portfolio.ui.PortfolioPlugin;
             }
             catch (RateLimitExceededException e)
             {
-                maxAttempts--;
-
-                if (maxAttempts >= 0 && e.getRetryAfter().isPositive())
+                int remainingAttemts = tasks.onRateLimitExceeded(this);
+                if (remainingAttemts >= 0 && e.getRetryAfter().isPositive())
                 {
-                    // add candidate back to the list to retry later
-                    candidates.addFirst(task);
-
+                    retry = true;
                     task.status.setStatus(UpdateStatus.WAITING, MessageFormat.format(
-                                    Messages.MsgRateLimitExceededAndRetrying, task.security.getName(), maxAttempts));
+                                    Messages.MsgRateLimitExceededAndRetrying, task.security.getName(),
+                                    remainingAttemts));
 
                     try
                     {
@@ -101,12 +100,8 @@ import name.abuchen.portfolio.ui.PortfolioPlugin;
                 {
                     task.status.setStatus(UpdateStatus.ERROR,
                                     MessageFormat.format(Messages.MsgRateLimitExceeded, task.security.getName()));
-                    for (var c : candidates)
-                        c.status.setStatus(UpdateStatus.ERROR,
-                                        MessageFormat.format(Messages.MsgRateLimitExceeded, c.security.getName()));
-
-                    // stop processing further tasks
-                    return Status.OK_STATUS;
+                    tasks.setGroupError(this, (security) -> MessageFormat.format(Messages.MsgRateLimitExceeded,
+                                    security.getName()));
                 }
             }
             catch (Exception e)
@@ -115,7 +110,6 @@ import name.abuchen.portfolio.ui.PortfolioPlugin;
                 PortfolioPlugin.log(e);
             }
         }
-
-        return Status.OK_STATUS;
     }
+
 }
