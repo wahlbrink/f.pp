@@ -280,7 +280,8 @@ public final class TransactionsViewer implements ModificationListener
             }
         });
 
-        ColumnViewerSorter.create(TransactionPair.BY_DATE).attachTo(column, SWT.DOWN);
+        column.setComparator(TransactionPair.BY_DATE);
+        column.setSortAsDefault();
         new DateTimeEditingSupport(Transaction.class, "dateTime").addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
@@ -301,7 +302,7 @@ public final class TransactionsViewer implements ModificationListener
                 return at.getType().toString();
             else
                 return null;
-        }).attachTo(column);
+        }, column.getDataType()).attachTo(column);
         new TransactionTypeEditingSupport(owner.getClient()).addListener(this).attachTo(column);
         support.addColumn(column);
 
@@ -309,10 +310,10 @@ public final class TransactionsViewer implements ModificationListener
         column.setLabelProvider(
                         new TransactionLabelProvider(t -> t.getSecurity() != null ? t.getSecurity().getName() : null,
                                         t -> t.getTransaction().getSecurity()));
-        ColumnViewerSorter.createIgnoreCase(e -> {
+        column.setCompareBy(e -> {
             Security s = ((TransactionPair<?>) e).getTransaction().getSecurity();
             return s != null ? s.getName() : null;
-        }).attachTo(column);
+        });
         support.addColumn(column);
 
         column = new IsinColumn();
@@ -355,7 +356,7 @@ public final class TransactionsViewer implements ModificationListener
                 return colors.getBackground(element);
             }
         });
-        ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getShares()).attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getShares());
         new ValueEditingSupport(Transaction.class, "shares", Values.Share) //$NON-NLS-1$
                         .setCanEditCheck(e -> ((TransactionPair<?>) e).getTransaction() instanceof PortfolioTransaction
                                         || (((TransactionPair<?>) e).getTransaction() instanceof AccountTransaction
@@ -375,10 +376,10 @@ public final class TransactionsViewer implements ModificationListener
             else
                 return null;
         }));
-        ColumnViewerSorter.create(e -> {
+        column.setCompareBy(e -> {
             Transaction tx = ((TransactionPair<?>) e).getTransaction();
             return tx instanceof PortfolioTransaction pt ? pt.getGrossPricePerShare() : null;
-        }).attachTo(column);
+        });
         support.addColumn(column);
 
         column = new Column("5", DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80); //$NON-NLS-1$
@@ -390,30 +391,28 @@ public final class TransactionsViewer implements ModificationListener
                 m = ((AccountTransaction) t).getGrossValue();
             return Values.Money.format(m, owner.getClient().getBaseCurrency());
         }));
-        ColumnViewerSorter.create(e -> {
+        column.setCompareBy(e -> {
             Transaction tx = ((TransactionPair<?>) e).getTransaction();
             return tx instanceof PortfolioTransaction pt ? pt.getGrossValue() : null;
-        }).attachTo(column);
+        });
         support.addColumn(column);
 
         column = new Column("6", DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(t -> Values.Money
                         .formatNonZero(t.getUnitSum(Transaction.Unit.Type.FEE), owner.getClient().getBaseCurrency())));
-        ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Transaction.Unit.Type.FEE))
-                        .attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Transaction.Unit.Type.FEE));
         support.addColumn(column);
 
         column = new Column("7", DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(t -> Values.Money
                         .formatNonZero(t.getUnitSum(Transaction.Unit.Type.TAX), owner.getClient().getBaseCurrency())));
-        ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Transaction.Unit.Type.TAX))
-                        .attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Transaction.Unit.Type.TAX));
         support.addColumn(column);
 
         column = new Column("8", DataType.MONEY, Messages.ColumnNetValue, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(
                         t -> Values.Money.format(t.getMonetaryAmount(), owner.getClient().getBaseCurrency())));
-        ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getMonetaryAmount()).attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getMonetaryAmount());
         support.addColumn(column);
 
         column = new Column("account", DataType.NAME, Messages.ColumnAccount, SWT.None, 120); //$NON-NLS-1$
@@ -427,7 +426,7 @@ public final class TransactionsViewer implements ModificationListener
         });
         new TransactionOwnerListEditingSupport(owner.getClient(), TransactionOwnerListEditingSupport.EditMode.OWNER)
                         .addListener(this).attachTo(column);
-        ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getOwner().toString()).attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getOwner().toString());
         support.addColumn(column);
 
         column = new Column("9", DataType.NAME, Messages.ColumnOffsetAccount, SWT.None, 120); //$NON-NLS-1$
@@ -438,10 +437,10 @@ public final class TransactionsViewer implements ModificationListener
                                         : null));
         new TransactionOwnerListEditingSupport(owner.getClient(),
                         TransactionOwnerListEditingSupport.EditMode.CROSSOWNER).addListener(this).attachTo(column);
-        ColumnViewerSorter.createIgnoreCase(e -> {
+        column.setCompareBy(e -> {
             Transaction t = ((TransactionPair<?>) e).getTransaction();
             return t.getCrossEntry() != null ? t.getCrossEntry().getCrossOwner(t).toString() : null;
-        }).attachTo(column);
+        });
         support.addColumn(column);
 
         column = new NoteColumn("10"); //$NON-NLS-1$
@@ -451,8 +450,7 @@ public final class TransactionsViewer implements ModificationListener
 
         column = new Column("source", DataType.NAME, Messages.ColumnSource, SWT.None, 200); //$NON-NLS-1$
         column.setLabelProvider(new TransactionLabelProvider(Transaction::getSource));
-        ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getTransaction().getSource())
-                        .attachTo(column); // $NON-NLS-1$
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getSource());
         support.addColumn(column);
     }
 

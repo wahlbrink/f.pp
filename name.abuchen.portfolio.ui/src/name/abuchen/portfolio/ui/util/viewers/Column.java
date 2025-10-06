@@ -3,6 +3,7 @@ package name.abuchen.portfolio.ui.util.viewers;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -167,20 +168,20 @@ public class Column
         this.sorter = sorter;
     }
 
-    public void setComparator(Comparator<Object> comparator)
+    public void setComparator(Comparator<?> comparator)
     {
-        this.sorter = ColumnViewerSorter.create(comparator);
+        this.sorter = ColumnViewerSorter.create(comparator, getDataType());
     }
 
-    public void setSorter(ColumnViewerSorter sorter, int direction)
+    public void setCompareBy(Function<Object, ? extends Comparable<?>> valueProvider)
     {
-        setSorter(sorter);
-        this.defaultSortDirection = direction;
+        this.sorter = ColumnViewerSorter.createFor(getDataType(), valueProvider);
     }
 
-    public void setSortDirction(int direction)
+    public void setSortAsDefault()
     {
-        this.defaultSortDirection = direction;
+        if (sorter != null)
+            this.defaultSortDirection = sorter.getDefaultDirection();
     }
 
     public void setLabelProvider(CellLabelProvider labelProvider)

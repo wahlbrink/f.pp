@@ -172,7 +172,8 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
                 return colorFor((AccountTransaction) element);
             }
         });
-        ColumnViewerSorter.create(Transaction.BY_DATE).attachTo(column, SWT.DOWN);
+        column.setComparator(Transaction.BY_DATE);
+        column.setSortAsDefault();
         new DateTimeEditingSupport(AccountTransaction.class, "dateTime").addListener(this).attachTo(column); //$NON-NLS-1$
         transactionsColumns.addColumn(column);
 
@@ -192,7 +193,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
                 return colorFor((AccountTransaction) element);
             }
         });
-        column.setSorter(ColumnViewerSorter.create(AccountTransaction.class, "type")); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(AccountTransaction.class, column.getDataType(), "type")); //$NON-NLS-1$
         new TransactionTypeEditingSupport(client).addListener(this).attachTo(column);
         transactionsColumns.addColumn(column);
 
@@ -215,7 +216,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
                 return colorFor((AccountTransaction) element);
             }
         });
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> {
+        column.setComparator((o1, o2) -> {
             AccountTransaction accountTransaction1 = (AccountTransaction) o1;
             long transactionAmount1 = accountTransaction1.getAmount();
             if (accountTransaction1.getType().isDebit())
@@ -225,13 +226,14 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
             if (accountTransaction2.getType().isDebit())
                 transactionAmount2 = -transactionAmount2;
             return Long.compare(transactionAmount1, transactionAmount2);
-        }));
+        });
         transactionsColumns.addColumn(column);
 
         column = new Column("fees", DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80); //$NON-NLS-1$
-        Function<AccountTransaction, Money> getFees = tx -> {
+        Function<Object, Money> getFees = e -> {
             // fees are stored with the portfolio transaction (for example
             // purchase and sale)
+            AccountTransaction tx = ((AccountTransaction) e);
             CrossEntry entry = tx.getCrossEntry();
             if (entry != null && entry.getCrossTransaction(tx) instanceof PortfolioTransaction)
                 return entry.getCrossTransaction(tx).getUnitSum(Unit.Type.FEE);
@@ -243,7 +245,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
             @Override
             public String getText(Object e)
             {
-                return Values.Money.formatNonZero(getFees.apply((AccountTransaction) e), client.getBaseCurrency());
+                return Values.Money.formatNonZero(getFees.apply(e), client.getBaseCurrency());
             }
 
             @Override
@@ -252,14 +254,15 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
                 return colorFor((AccountTransaction) element);
             }
         });
-        ColumnViewerSorter.create(element -> getFees.apply((AccountTransaction) element)).attachTo(column);
+        column.setCompareBy(getFees);
         column.setVisible(false);
         transactionsColumns.addColumn(column);
 
         column = new Column("taxes", DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80); //$NON-NLS-1$
-        Function<AccountTransaction, Money> getTaxes = tx -> {
+        Function<Object, Money> getTaxes = e -> {
             // taxes are stored with the portfolio transaction (for example
             // purchase and sale)
+            AccountTransaction tx = ((AccountTransaction) e);
             CrossEntry entry = tx.getCrossEntry();
             if (entry != null && entry.getCrossTransaction(tx) instanceof PortfolioTransaction)
                 return entry.getCrossTransaction(tx).getUnitSum(Unit.Type.TAX);
@@ -271,7 +274,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
             @Override
             public String getText(Object e)
             {
-                return Values.Money.formatNonZero(getTaxes.apply((AccountTransaction) e), client.getBaseCurrency());
+                return Values.Money.formatNonZero(getTaxes.apply(e), client.getBaseCurrency());
             }
 
             @Override
@@ -280,7 +283,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
                 return colorFor((AccountTransaction) element);
             }
         });
-        ColumnViewerSorter.create(element -> getTaxes.apply((AccountTransaction) element)).attachTo(column);
+        column.setCompareBy(getTaxes);
         column.setVisible(false);
         transactionsColumns.addColumn(column);
 
@@ -302,11 +305,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
             }
         });
 
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> {
-            Money m1 = transaction2balance.get(o1);
-            Money m2 = transaction2balance.get(o2);
-            return m1.compareTo(m2);
-        }));
+        column.setCompareBy(transaction2balance::get);
         transactionsColumns.addColumn(column);
 
         column = new NameColumn("4", //$NON-NLS-1$
@@ -442,7 +441,7 @@ public class AccountTransactionsPane implements InformationPanePage, Modificatio
                 return colorFor((AccountTransaction) element);
             }
         });
-        ColumnViewerSorter.createIgnoreCase(e -> ((AccountTransaction) e).getSource()).attachTo(column); // $NON-NLS-1$
+        column.setCompareBy(e -> ((AccountTransaction) e).getSource());
         transactionsColumns.addColumn(column);
 
         transactionsColumns.createColumns(true);

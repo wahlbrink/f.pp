@@ -79,6 +79,7 @@ import name.abuchen.portfolio.model.PortfolioTransferEntry;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.PortfolioPlugin;
@@ -471,7 +472,8 @@ public class ReviewExtractedItemsPage extends AbstractWizardPage implements Impo
                 return ""; //$NON-NLS-1$
             }
         });
-        ColumnViewerSorter.create(entry -> ((ExtractedEntry) entry).getMaxCode()).attachTo(viewer, column);
+        ColumnViewerSorter.createFor(DataType.OTHER_NUMBER, entry -> ((ExtractedEntry) entry).getMaxCode())
+                        .attachTo(viewer, column);
         layout.setColumnData(column.getColumn(), new ColumnPixelData(22, true));
 
         column = new TableViewerColumn(viewer, SWT.NONE);
@@ -485,7 +487,8 @@ public class ReviewExtractedItemsPage extends AbstractWizardPage implements Impo
                 return date != null ? Values.DateTime.format(date) : null;
             }
         });
-        ColumnViewerSorter.create(entry -> ((ExtractedEntry) entry).getItem().getDate()).attachTo(viewer, column);
+        ColumnViewerSorter.createFor(DataType.DATE, entry -> ((ExtractedEntry) entry).getItem().getDate())
+                        .attachTo(viewer, column);
         layout.setColumnData(column.getColumn(), new ColumnPixelData(80, true));
 
         column = new TableViewerColumn(viewer, SWT.NONE);

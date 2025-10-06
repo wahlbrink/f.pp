@@ -15,6 +15,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.views.payments.PaymentsViewModel.Line;
 import name.abuchen.portfolio.util.TextUtil;
@@ -148,7 +149,8 @@ public class PaymentsPerQuarterMatrixTab extends PaymentsMatrixTab
             }
         });
 
-        createSorter((l1, l2) -> Long.compare(valueFunction.applyAsLong(l1), valueFunction.applyAsLong(l2)))
+        createSorter((l1, l2) -> Long.compare(valueFunction.applyAsLong(l1), valueFunction.applyAsLong(l2)),
+                                DataType.MONEY)
                         .attachTo(records, column);
 
         layout.setColumnData(column.getColumn(), new ColumnPixelData(50));
@@ -189,7 +191,7 @@ public class PaymentsPerQuarterMatrixTab extends PaymentsMatrixTab
             var avg1 = PaymentsAverageCalculator.calculateAveragePerQuarter(l1.getSum(), l1.getNoOfMonths());
             var avg2 = PaymentsAverageCalculator.calculateAveragePerQuarter(l2.getSum(), l2.getNoOfMonths());
             return Long.compare(avg1, avg2);
-        }).attachTo(records, column);
+        }, DataType.MONEY).attachTo(records, column);
 
         layout.setColumnData(column.getColumn(), new ColumnPixelData(200));
     }

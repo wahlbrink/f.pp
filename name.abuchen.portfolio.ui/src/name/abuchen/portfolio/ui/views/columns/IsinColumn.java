@@ -13,7 +13,6 @@ import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.ModificationListener;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.util.Isin;
 
 public class IsinColumn extends Column
@@ -83,7 +82,7 @@ public class IsinColumn extends Column
                 return getIsin.apply(e);
             }
         });
-        setSorter(ColumnViewerSorter.createIgnoreCase(getIsin));
+        setCompareBy(getIsin);
     }
 
     private void addEditingSupport(ModificationListener listener)

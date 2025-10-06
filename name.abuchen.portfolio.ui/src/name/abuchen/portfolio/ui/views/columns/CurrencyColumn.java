@@ -12,7 +12,6 @@ import name.abuchen.portfolio.money.CurrencyUnit;
 import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.ListEditingSupport;
 
 public class CurrencyColumn extends Column
@@ -62,7 +61,7 @@ public class CurrencyColumn extends Column
         super(id, DataType.CURRENCY, label, SWT.LEFT, 60);
 
         setLabelProvider(new CurrencyColumnLabelProvider(getCurrencyCode));
-        setSorter(ColumnViewerSorter.createIgnoreCase(getCurrencyCode));
+        setCompareBy(getCurrencyCode);
     }
 
 }

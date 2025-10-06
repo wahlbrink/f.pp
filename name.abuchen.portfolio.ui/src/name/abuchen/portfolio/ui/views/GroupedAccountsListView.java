@@ -70,7 +70,6 @@ import name.abuchen.portfolio.ui.util.swt.StyledLabel;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.ModificationListener;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
 import name.abuchen.portfolio.ui.util.viewers.LocaleSenstiveViewerComparator;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
@@ -293,13 +292,6 @@ public class GroupedAccountsListView extends AbstractFinanceView implements Modi
         new StringEditingSupport(ClientFilterMenu.Item.class, "label").setMandatory(true) //$NON-NLS-1$
                         .addListener(this).attachTo(column);
         column.setRemovable(false);
-        // top level nodes order is manually sorted by the user via drag & drop
-        column.setSorter(ColumnViewerSorter.create(o -> switch (o)
-        {
-            case Portfolio portfolio -> portfolio.getName();
-            case Account account -> account.getName();
-            default -> null;
-        }));
 
         groupedAccountColumns.addColumn(column);
 
@@ -331,7 +323,7 @@ public class GroupedAccountsListView extends AbstractFinanceView implements Modi
             }
         });
         // add a sorter
-        column.setSorter(ColumnViewerSorter.create(o -> {
+        column.setCompareBy(o -> {
             if (o instanceof Portfolio portfolio)
             {
                 PortfolioSnapshot snapshot = PortfolioSnapshot.create(portfolio, converter, LocalDate.now());
@@ -343,7 +335,7 @@ public class GroupedAccountsListView extends AbstractFinanceView implements Modi
                 return snapshot.getFunds(); // converted amount to sort
             }
             return null;
-        }));
+        });
         groupedAccountColumns.addColumn(column);
 
         column = new NoteColumn();

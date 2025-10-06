@@ -395,7 +395,8 @@ public class TabularDataSource implements Named
             else
                 tableLayout.setColumnData(tableColumn.getColumn(), new ColumnPixelData(column.width));
 
-            ColumnViewerSorter.create(new ComparatorImplementation(column, index)).attachTo(tableViewer, tableColumn);
+            ColumnViewerSorter.create(new ComparatorImplementation(column, index), SWT.DOWN).attachTo(tableViewer,
+                            tableColumn);
         }
 
         tableViewer.setContentProvider(new TabularDataProvider());

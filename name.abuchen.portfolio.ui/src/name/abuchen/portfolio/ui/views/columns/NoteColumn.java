@@ -14,7 +14,6 @@ import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.ModificationListener;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.StringEditingSupport;
 import name.abuchen.portfolio.util.TextUtil;
 
@@ -80,7 +79,7 @@ public class NoteColumn extends Column
             }
 
         });
-        setSorter(ColumnViewerSorter.createIgnoreCase(getNote));
+        setCompareBy(getNote);
     }
 
     private void addEditingSupport(ModificationListener listener)
