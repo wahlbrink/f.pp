@@ -46,7 +46,6 @@ import name.abuchen.portfolio.ui.util.swt.SashLayout;
 import name.abuchen.portfolio.ui.util.swt.SashLayoutData;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
 import name.abuchen.portfolio.util.TextUtil;
 
@@ -223,7 +222,8 @@ public class TroubleshootBalanceDiscrepancyDialog extends Dialog
             }
 
         });
-        column.setSorter(ColumnViewerSorter.create(element -> ((Balance) element).getDate()), SWT.DOWN);
+        column.setCompareBy(element -> ((Balance) element).getDate());
+        column.setSortAsDefault();
         support.addColumn(column);
 
         column = new Column("value", DataType.MONEY, Messages.Balance, SWT.RIGHT, 120); //$NON-NLS-1$

@@ -213,7 +213,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
                 return LogoManager.instance().getDefaultColumnImage(plan.getPortfolio(), getClient().getSettings());
             }
         });
-        ColumnViewerSorter.create(InvestmentPlan.class, "portfolio").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(InvestmentPlan.class, column.getDataType(), "portfolio").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new NameColumn("accountName", //$NON-NLS-1$
@@ -223,19 +223,20 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
 
         column = new Column(DataType.DATE, Messages.ColumnStartDate, SWT.None, 80);
         column.setLabelProvider(new DateLabelProvider(e -> ((InvestmentPlan) e).getStart()));
-        ColumnViewerSorter.create(InvestmentPlan.class, "start").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(InvestmentPlan.class, column.getDataType(), "start").attachTo(column); //$NON-NLS-1$
         new DateEditingSupport(InvestmentPlan.class, "start").addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new Column(DataType.DATE, Messages.ColumnLastDate, SWT.None, 80);
         column.setLabelProvider(new DateLabelProvider(e -> ((InvestmentPlan) e).getLastDate().orElse(null)));
-        ColumnViewerSorter.create(InvestmentPlan.class, "LastDate").attachTo(column); //$NON-NLS-1$
+        column.setCompareBy(e -> ((InvestmentPlan) e).getLastDate().orElse(null));
         support.addColumn(column);
 
         column = new Column(DataType.FUTURE_DATE, Messages.ColumnNextDate, SWT.None, 80);
         column.setLabelProvider(
                         new DateLabelProvider(e -> ((InvestmentPlan) e).getDateOfNextTransactionToBeGenerated()));
-        ColumnViewerSorter.create(InvestmentPlan.class, "DateOfNextTransactionToBeGenerated").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(InvestmentPlan.class, column.getDataType(), "DateOfNextTransactionToBeGenerated") //$NON-NLS-1$
+                        .attachTo(column);
         support.addColumn(column);
 
         column = new Column(DataType.OTHER_ENUM, Messages.ColumnInterval, SWT.None, 80);
@@ -248,7 +249,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
                 return InvestmentPlanModel.Intervals.get(interval).toString();
             }
         });
-        ColumnViewerSorter.create(InvestmentPlan.class, "interval").attachTo(column); //$NON-NLS-1$
+        column.setCompareBy((e) -> ((InvestmentPlan) e).getInterval());
         List<Integer> available = new ArrayList<>();
         List<String> theIntervalNames = new ArrayList<>();
         for (var entry : InvestmentPlanModel.Intervals.values())
@@ -270,7 +271,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
                 return Values.Money.format(Money.of(plan.getCurrencyCode(), plan.getAmount()));
             }
         });
-        ColumnViewerSorter.create(InvestmentPlan.class, "amount").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(InvestmentPlan.class, column.getDataType(), "amount").attachTo(column); //$NON-NLS-1$
         new ValueEditingSupport(InvestmentPlan.class, "amount", Values.Amount).addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
@@ -284,7 +285,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
                 return Values.Money.formatNonZero(Money.of(plan.getCurrencyCode(), plan.getFees()));
             }
         });
-        ColumnViewerSorter.create(InvestmentPlan.class, "fees").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(InvestmentPlan.class, column.getDataType(), "fees").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80);
@@ -297,7 +298,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
                 return Values.Money.formatNonZero(Money.of(plan.getCurrencyCode(), plan.getTaxes()));
             }
         });
-        ColumnViewerSorter.create(InvestmentPlan.class, "taxes").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(InvestmentPlan.class, column.getDataType(), "taxes").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new Column(DataType.OTHER_BOOLEAN, Messages.ColumnAutoGenerate, SWT.LEFT, 80);
@@ -315,7 +316,7 @@ public class InvestmentPlanListView extends AbstractFinanceView implements Modif
                 return ((InvestmentPlan) e).isAutoGenerate() ? Images.CHECK.image() : null;
             }
         });
-        ColumnViewerSorter.create(InvestmentPlan.class, "autoGenerate").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(InvestmentPlan.class, column.getDataType(), "autoGenerate").attachTo(column); //$NON-NLS-1$
         new BooleanEditingSupport(InvestmentPlan.class, "autoGenerate").addListener(this).attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 

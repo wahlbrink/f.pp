@@ -45,6 +45,7 @@ import name.abuchen.portfolio.model.TransactionPair;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.online.Factory;
 import name.abuchen.portfolio.online.impl.DivvyDiaryDividendFeed;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.PortfolioPlugin;
@@ -248,7 +249,8 @@ public class BackfillExDatesHandler
                 }
             });
             layout.setColumnData(column.getColumn(), new ColumnPixelData(90));
-            ColumnViewerSorter.create(e -> ((MatchedTransaction) e).transaction().getTransaction().getDateTime())
+            ColumnViewerSorter.createFor(DataType.DATE,
+                                    e -> ((MatchedTransaction) e).transaction().getTransaction().getDateTime())
                             .attachTo(tableViewer, column);
 
             column = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -262,7 +264,8 @@ public class BackfillExDatesHandler
                 }
             });
             layout.setColumnData(column.getColumn(), new ColumnPixelData(140));
-            ColumnViewerSorter.create(e -> ((Account) ((MatchedTransaction) e).transaction().getOwner()).getName())
+            ColumnViewerSorter.createFor(DataType.NAME,
+                                    e -> ((Account) ((MatchedTransaction) e).transaction().getOwner()).getName())
                             .attachTo(tableViewer, column);
 
             column = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -284,8 +287,8 @@ public class BackfillExDatesHandler
                 }
             });
             layout.setColumnData(column.getColumn(), new ColumnPixelData(260));
-            ColumnViewerSorter.create(
-                            e -> ((MatchedTransaction) e).transaction().getTransaction().getSecurity().getName())
+            ColumnViewerSorter.createFor(DataType.NAME,
+                                    e -> ((MatchedTransaction) e).transaction().getTransaction().getSecurity().getName())
                             .attachTo(tableViewer, column);
 
             column = new TableViewerColumn(tableViewer, SWT.RIGHT);
@@ -301,7 +304,8 @@ public class BackfillExDatesHandler
                 }
             });
             layout.setColumnData(column.getColumn(), new ColumnPixelData(110));
-            ColumnViewerSorter.create(e -> ((MatchedTransaction) e).transaction().getTransaction().getAmount())
+            ColumnViewerSorter.createFor(DataType.MONEY,
+                                    e -> ((MatchedTransaction) e).transaction().getTransaction().getAmount())
                             .attachTo(tableViewer, column);
 
             column = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -315,7 +319,9 @@ public class BackfillExDatesHandler
                 }
             });
             layout.setColumnData(column.getColumn(), new ColumnPixelData(90));
-            ColumnViewerSorter.create(e -> ((MatchedTransaction) e).exDate()).attachTo(tableViewer, column);
+            ColumnViewerSorter.createFor(DataType.DATE,
+                                    e -> ((MatchedTransaction) e).exDate())
+                            .attachTo(tableViewer, column);
 
             tableViewer.setInput(matches);
 

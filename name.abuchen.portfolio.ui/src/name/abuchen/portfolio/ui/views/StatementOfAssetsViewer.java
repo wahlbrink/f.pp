@@ -591,7 +591,8 @@ public class StatementOfAssetsViewer
                 return ((Element) e).isGroupByTaxonomy() || ((Element) e).isCategory() ? boldFont : null;
             }
         });
-        column.setSorter(ColumnViewerSorter.create(Element.class, "valuation").wrap(ElementComparator::new)); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(Element.class, column.getDataType(), "valuation") //$NON-NLS-1$
+                        .wrap(ElementComparator::new));
         support.addColumn(column);
 
         column = new Column("6", Messages.ColumnShareInPercent, SWT.RIGHT, 80); //$NON-NLS-1$
@@ -615,7 +616,8 @@ public class StatementOfAssetsViewer
                 return ((Element) e).isGroupByTaxonomy() || ((Element) e).isCategory() ? boldFont : null;
             }
         });
-        column.setSorter(ColumnViewerSorter.create(Element.class, "valuation").wrap(ElementComparator::new)); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(Element.class, column.getDataType(), "valuation") //$NON-NLS-1$
+                        .wrap(ElementComparator::new));
         support.addColumn(column);
 
         addPurchaseCostColumns();
@@ -631,7 +633,8 @@ public class StatementOfAssetsViewer
         labelProvider = new ReportingPeriodLabelProvider(new ElementValueProvider(
                         record -> record.getCost(CostMethod.FIFO, TaxesAndFees.INCLUDED), withSum()), false);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -643,7 +646,8 @@ public class StatementOfAssetsViewer
         labelProvider = new ReportingPeriodLabelProvider(new ElementValueProvider(
                         record -> record.getCost(CostMethod.MOVING_AVERAGE, TaxesAndFees.INCLUDED), withSum()), false);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -656,7 +660,8 @@ public class StatementOfAssetsViewer
         labelProvider = new ReportingPeriodLabelProvider(new ElementValueProvider(
                         record -> record.getCapitalGainsOnHoldings(CostMethod.FIFO), withSum()), true);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -672,7 +677,7 @@ public class StatementOfAssetsViewer
         labelProvider = new ReportingPeriodLabelProvider(new ElementValueProvider(
                         record -> record.getCapitalGainsOnHoldings(CostMethod.MOVING_AVERAGE), withSum()), true);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -825,7 +830,8 @@ public class StatementOfAssetsViewer
                         record -> record.getCostPerSharesHeld(CostMethod.FIFO, TaxesAndFees.NOT_INCLUDED), null),
                         false);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -838,7 +844,8 @@ public class StatementOfAssetsViewer
                         record -> record.getCostPerSharesHeld(CostMethod.MOVING_AVERAGE, TaxesAndFees.NOT_INCLUDED),
                         null), false);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -851,7 +858,8 @@ public class StatementOfAssetsViewer
         labelProvider = new ReportingPeriodLabelProvider(new ElementValueProvider(
                         record -> record.getCostPerSharesHeld(CostMethod.FIFO, TaxesAndFees.INCLUDED), null), false);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -864,7 +872,8 @@ public class StatementOfAssetsViewer
                         record -> record.getCostPerSharesHeld(CostMethod.MOVING_AVERAGE, TaxesAndFees.INCLUDED), null),
                         false);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
     }
@@ -880,7 +889,7 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.LabelTTWROR);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -892,7 +901,7 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.LabelTTWROR_Annualized);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -903,7 +912,7 @@ public class StatementOfAssetsViewer
         column.setMenuLabel(Messages.ColumnIRR_MenuLabel);
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -914,7 +923,7 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.ColumnCapitalGains_Description);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -925,7 +934,7 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.ColumnCapitalGainsPercent_Description);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -936,7 +945,8 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.ColumnCapitalGainsMovingAverage_Description);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -948,7 +958,8 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.ColumnCapitalGainsMovingAveragePercent_Description);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -958,7 +969,8 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.ColumnAbsolutePerformance_Description);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
 
@@ -968,7 +980,8 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelPerformance);
         column.setDescription(Messages.ColumnAbsolutePerformancePercent_Description);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
+
         column.setVisible(false);
         support.addColumn(column);
     }
@@ -985,7 +998,7 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelDividends);
         column.setMenuLabel(Messages.ColumnDividendSum_MenuLabel);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -996,7 +1009,7 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelDividends);
         column.setDescription(Messages.ColumnDividendTotalRateOfReturn_Description);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -1008,7 +1021,7 @@ public class StatementOfAssetsViewer
         column.setGroupLabel(Messages.GroupLabelDividends);
         column.setDescription(Messages.ColumnDividendMovingAverageTotalRateOfReturn_Description);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -1194,7 +1207,7 @@ public class StatementOfAssetsViewer
                                         : model.getCurrencyConverter().getTermCurrency(),
                         false);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -1208,7 +1221,7 @@ public class StatementOfAssetsViewer
                                         : model.getCurrencyConverter().getTermCurrency(),
                         false);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -1222,7 +1235,7 @@ public class StatementOfAssetsViewer
                                         : model.getCurrencyConverter().getTermCurrency(),
                         true);
         column.setLabelProvider(labelProvider);
-        column.setSorter(ColumnViewerSorter.create(new ElementComparator(labelProvider)));
+        column.setComparator(new ElementComparator(labelProvider));
         column.setVisible(false);
         column.setVisible(false);
         support.addColumn(column);
