@@ -41,6 +41,7 @@ import name.abuchen.portfolio.model.InvestmentVehicle;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Values;
 import name.abuchen.portfolio.snapshot.filter.ReadOnlyAccount;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.editor.AbstractFinanceView;
 import name.abuchen.portfolio.ui.selection.SecuritySelection;
@@ -265,13 +266,13 @@ public abstract class PaymentsMatrixTab implements PaymentsTab
             }
         });
 
-        createSorter((l1, l2) -> TextUtil.compare(l1.getVehicle().getName(), l2.getVehicle().getName()))
+        createSorter((l1, l2) -> TextUtil.compare(l1.getVehicle().getName(), l2.getVehicle().getName()), DataType.NAME)
                         .attachTo(records, column, isSorted);
 
         layout.setColumnData(column.getColumn(), new ColumnPixelData(200));
     }
 
-    protected ColumnViewerSorter createSorter(Comparator<PaymentsViewModel.Line> comparator)
+    protected ColumnViewerSorter createSorter(Comparator<PaymentsViewModel.Line> comparator, DataType dataType)
     {
         return ColumnViewerSorter.create((o1, o2) -> {
             int direction = ColumnViewerSorter.SortingContext.getSortDirection();
@@ -285,7 +286,7 @@ public abstract class PaymentsMatrixTab implements PaymentsTab
                 return direction == SWT.UP ^ line2.isHeader() ? -1 : 1;
 
             return comparator.compare(line1, line2);
-        });
+        }, dataType);
     }
 
     protected void createSumColumn(TableViewer records, TableColumnLayout layout, boolean showOnlyFirstYear)
@@ -326,7 +327,8 @@ public abstract class PaymentsMatrixTab implements PaymentsTab
             }
         });
 
-        createSorter((l1, l2) -> Long.compare(valueFunction.applyAsLong(l1), valueFunction.applyAsLong(l2)))
+        createSorter((l1, l2) -> Long.compare(valueFunction.applyAsLong(l1), valueFunction.applyAsLong(l2)),
+                                DataType.MONEY)
                         .attachTo(records, column);
 
         layout.setColumnData(column.getColumn(), new ColumnPixelData(200));

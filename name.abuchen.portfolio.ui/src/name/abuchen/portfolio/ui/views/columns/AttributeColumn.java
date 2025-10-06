@@ -398,7 +398,6 @@ public class AttributeColumn extends Column
 
         setMenuLabel(attribute.getName());
         setGroupLabel(Messages.GroupLabelAttributes);
-        setSorter(ColumnViewerSorter.create(new AttributeComparator(attribute)));
 
         if (attribute.getType() == Boolean.class)
         {
@@ -431,6 +430,9 @@ public class AttributeColumn extends Column
             setLabelProvider(new AttributeLabelProvider(attribute));
             new AttributeEditingSupport(attribute).attachTo(this);
         }
+
+        if (getSorter() == null)
+            setComparator(new AttributeComparator(attribute));
 
     }
 
@@ -466,7 +468,7 @@ public class AttributeColumn extends Column
                         attribute.getColumnLabel() + " - " + Messages.ColumnDaysBetweenPostfix, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setMenuLabel(attribute.getName() + " - " + Messages.ColumnDaysBetweenPostfix); //$NON-NLS-1$
         column.setGroupLabel(Messages.GroupLabelAttributes);
-        column.setSorter(ColumnViewerSorter.create(new AttributeComparator(attribute)));
+        column.setSorter(ColumnViewerSorter.create(new AttributeComparator(attribute), SWT.UP));
         new AttributeEditingSupport(attribute).attachTo(column);
 
         column.setLabelProvider(new ColumnLabelProvider()

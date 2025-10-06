@@ -60,7 +60,6 @@ import name.abuchen.portfolio.ui.util.SimpleAction;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.TouchClientListener;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
 import name.abuchen.portfolio.ui.util.viewers.DateLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.ShowHideColumnHelper;
@@ -305,7 +304,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
         // security name
         Column column = new NameColumn(getClient());
         column.getEditingSupport().addListener(new TouchClientListener(getClient()));
-        column.setSortDirction(SWT.UP);
+        column.setSortAsDefault();
         columns.addColumn(column);
 
         addColumnLatestPrice();
@@ -360,7 +359,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                                     getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> {
+        column.setComparator((o1, o2) -> {
             SecurityPrice p1 = ((Security) o1).getSecurityPrice(LocalDate.now());
             SecurityPrice p2 = ((Security) o2).getSecurityPrice(LocalDate.now());
 
@@ -370,7 +369,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                 return 1;
 
             return Long.compare(p1.getValue(), p2.getValue());
-        }));
+        });
         columns.addColumn(column);
     }
 
@@ -403,7 +402,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                 return latest.getDate().isBefore(sevenDaysAgo) ? Colors.theme().warningBackground() : null;
             }
         });
-        column.setSorter(ColumnViewerSorter.create(dataProvider::apply));
+        column.setCompareBy(dataProvider);
         columns.addColumn(column);
     }
 
@@ -462,7 +461,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                 return quoteFeed.apply(e);
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(quoteFeed::apply));
+        column.setCompareBy(quoteFeed);
         columns.addColumn(column);
 
         label = MessageFormat.format(Messages.LabelWithQualifier, Messages.EditWizardQuoteFeedLabelFeedURL,
@@ -480,7 +479,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                 return security.getFeedURL();
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(s -> ((Security) s).getFeedURL()));
+        column.setCompareBy(s -> ((Security) s).getFeedURL());
         columns.addColumn(column);
     }
 
@@ -540,7 +539,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                 return latestQuoteFeed.apply(e);
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(latestQuoteFeed::apply));
+        column.setCompareBy(latestQuoteFeed);
         columns.addColumn(column);
 
         label = MessageFormat.format(Messages.LabelWithQualifier, Messages.EditWizardQuoteFeedLabelFeedURL,
@@ -558,7 +557,7 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                 return security.getLatestFeedURL();
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(s -> ((Security) s).getLatestFeedURL()));
+        column.setCompareBy(s -> ((Security) s).getLatestFeedURL());
         columns.addColumn(column);
     }
 

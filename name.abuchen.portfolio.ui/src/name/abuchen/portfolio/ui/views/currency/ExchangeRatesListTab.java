@@ -104,8 +104,10 @@ public class ExchangeRatesListTab implements AbstractTabbedView.Tab
                 return ((ExchangeRateTimeSeries) element).getBaseCurrency();
             }
         });
-        ColumnViewerSorter.create(ExchangeRateTimeSeries.class, "baseCurrency", "termCurrency") //$NON-NLS-1$ //$NON-NLS-2$
-                        .attachTo(column, SWT.UP);
+        column.setSorter(ColumnViewerSorter.create(ExchangeRateTimeSeries.class, column.getDataType(),
+                        "baseCurrency", "termCurrency") //$NON-NLS-1$ //$NON-NLS-2$
+        );
+        column.setSortAsDefault();
         support.addColumn(column);
 
         column = new Column(DataType.CURRENCY, Messages.ColumnTermCurrency, SWT.None, 80);
@@ -117,7 +119,7 @@ public class ExchangeRatesListTab implements AbstractTabbedView.Tab
                 return ((ExchangeRateTimeSeries) element).getTermCurrency();
             }
         });
-        ColumnViewerSorter.create(ExchangeRateTimeSeries.class, "termCurrency", "baseCurrency") //$NON-NLS-1$ //$NON-NLS-2$
+        ColumnViewerSorter.create(ExchangeRateTimeSeries.class, column.getDataType(), "termCurrency", "baseCurrency") //$NON-NLS-1$ //$NON-NLS-2$
                         .attachTo(column);
         support.addColumn(column);
 
@@ -131,7 +133,7 @@ public class ExchangeRatesListTab implements AbstractTabbedView.Tab
                 return provider.isPresent() ? provider.get().getName() : ""; //$NON-NLS-1$
             }
         });
-        ColumnViewerSorter.create(ExchangeRateTimeSeries.class, "provider").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(ExchangeRateTimeSeries.class, column.getDataType(), "provider").attachTo(column); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new Column(DataType.DATE, Messages.ColumnDateLatestExchangeRate, SWT.None, 150);
@@ -142,7 +144,7 @@ public class ExchangeRatesListTab implements AbstractTabbedView.Tab
             return rates.isEmpty() ? null : rates.get(rates.size() - 1).getTime();
         };
         column.setLabelProvider(new DateLabelProvider(dataProvider));
-        ColumnViewerSorter.create(dataProvider::apply).attachTo(column);
+        column.setCompareBy(dataProvider);
         support.addColumn(column);
 
         support.createColumns();

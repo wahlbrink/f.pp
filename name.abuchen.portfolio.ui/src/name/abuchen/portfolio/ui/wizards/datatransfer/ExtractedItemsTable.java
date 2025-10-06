@@ -46,6 +46,7 @@ import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.model.PortfolioTransferEntry;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.dialogs.ListSelectionDialog;
@@ -155,7 +156,8 @@ public class ExtractedItemsTable
                 return ""; //$NON-NLS-1$
             }
         });
-        ColumnViewerSorter.create(entry -> ((ExtractedEntry) entry).getMaxCode()).attachTo(tableViewer, column);
+        ColumnViewerSorter.createFor(DataType.OTHER_NUMBER, entry -> ((ExtractedEntry) entry).getMaxCode())
+                        .attachTo(tableViewer, column);
         layout.setColumnData(column.getColumn(), new ColumnPixelData(22, true));
 
         column = new TableViewerColumn(tableViewer, SWT.NONE);
@@ -169,7 +171,8 @@ public class ExtractedItemsTable
                 return date != null ? Values.DateTime.format(date) : null;
             }
         });
-        ColumnViewerSorter.create(entry -> ((ExtractedEntry) entry).getItem().getDate()).attachTo(tableViewer, column);
+        ColumnViewerSorter.createFor(DataType.DATE, entry -> ((ExtractedEntry) entry).getItem().getDate())
+                        .attachTo(tableViewer, column);
         layout.setColumnData(column.getColumn(), new ColumnPixelData(80, true));
 
         column = new TableViewerColumn(tableViewer, SWT.NONE);

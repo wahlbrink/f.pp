@@ -36,7 +36,6 @@ import name.abuchen.portfolio.ui.util.SimpleAction;
 import name.abuchen.portfolio.ui.util.TableViewerCSVExporter;
 import name.abuchen.portfolio.ui.util.swt.ActiveShell;
 import name.abuchen.portfolio.ui.util.viewers.Column;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
 import name.abuchen.portfolio.ui.util.viewers.DateEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.DateLabelProvider;
@@ -106,7 +105,8 @@ public class SecurityEventsPane implements InformationPanePage
 
         Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 80);
         column.setLabelProvider(new DateLabelProvider(e -> ((SecurityEvent) e).getDate()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((SecurityEvent) e).getDate()), SWT.DOWN);
+        column.setCompareBy(e -> ((SecurityEvent) e).getDate());
+        column.setSortAsDefault();
         column.setEditingSupport(new DateEditingSupport(SecurityEvent.class, "date") //$NON-NLS-1$
         {
             @Override
@@ -126,14 +126,13 @@ public class SecurityEventsPane implements InformationPanePage
                 return ((SecurityEvent) element).getType().toString();
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> ((SecurityEvent) e).getType()));
+        column.setCompareBy(e -> ((SecurityEvent) e).getType());
         support.addColumn(column);
 
         column = new Column(DataType.DATE, Messages.ColumnPaymentDate, SWT.NONE, 80);
         column.setLabelProvider(new DateLabelProvider(
                         e -> e instanceof DividendEvent dividendEvent ? dividendEvent.getPaymentDate() : null));
-        column.setSorter(ColumnViewerSorter
-                        .create(e -> e instanceof DividendEvent dividendEvent ? dividendEvent.getPaymentDate() : null));
+        column.setCompareBy(e -> e instanceof DividendEvent dividendEvent ? dividendEvent.getPaymentDate() : null);
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnAmount, SWT.NONE, 80);
@@ -147,8 +146,7 @@ public class SecurityEventsPane implements InformationPanePage
                                 : null;
             }
         });
-        column.setSorter(ColumnViewerSorter
-                        .create(e -> e instanceof DividendEvent dividendEvent ? dividendEvent.getAmount() : null));
+        column.setCompareBy(e -> e instanceof DividendEvent dividendEvent ? dividendEvent.getAmount() : null);
         support.addColumn(column);
 
         column = new Column(DataType.OTHER_TEXT, Messages.ColumnDetails, SWT.None, 300);
@@ -161,7 +159,7 @@ public class SecurityEventsPane implements InformationPanePage
                 return event == null || event.isEmpty() ? null : TextUtil.toSingleLine(event);
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(e -> ((SecurityEvent) e).getDetails()));
+        column.setCompareBy(e -> ((SecurityEvent) e).getDetails());
         column.setEditingSupport(new StringEditingSupport(SecurityEvent.class, "details") //$NON-NLS-1$
         {
             @Override

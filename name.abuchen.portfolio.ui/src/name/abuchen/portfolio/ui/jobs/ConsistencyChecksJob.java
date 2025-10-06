@@ -41,6 +41,7 @@ import name.abuchen.portfolio.checks.Issue;
 import name.abuchen.portfolio.checks.QuickFix;
 import name.abuchen.portfolio.model.Client;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Images;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.LogoManager;
@@ -162,7 +163,7 @@ public class ConsistencyChecksJob extends AbstractClientJob
                 }
             });
             layout.setColumnData(col.getColumn(), new ColumnPixelData(80));
-            ColumnViewerSorter.create(ReportedIssue.class, "date").attachTo(tableViewer, col, true); //$NON-NLS-1$
+            ColumnViewerSorter.create(ReportedIssue.class, DataType.DATE, "date").attachTo(tableViewer, col, true); //$NON-NLS-1$
 
             col = new TableViewerColumn(tableViewer, SWT.NONE);
             col.getColumn().setText(Messages.ColumnEntity);
@@ -187,7 +188,7 @@ public class ConsistencyChecksJob extends AbstractClientJob
                 }
             });
             layout.setColumnData(col.getColumn(), new ColumnPixelData(100));
-            ColumnViewerSorter.create(ReportedIssue.class, "entity").attachTo(tableViewer, col); //$NON-NLS-1$
+            ColumnViewerSorter.create(ReportedIssue.class, DataType.OTHER_TEXT, "entity").attachTo(tableViewer, col); //$NON-NLS-1$
 
             col = new TableViewerColumn(tableViewer, SWT.RIGHT);
             col.getColumn().setText(Messages.ColumnAmount);
@@ -201,7 +202,7 @@ public class ConsistencyChecksJob extends AbstractClientJob
                 }
             });
             layout.setColumnData(col.getColumn(), new ColumnPixelData(80));
-            ColumnViewerSorter.create(ReportedIssue.class, "amount").attachTo(tableViewer, col); //$NON-NLS-1$
+            ColumnViewerSorter.create(ReportedIssue.class, DataType.MONEY, "amount").attachTo(tableViewer, col); //$NON-NLS-1$
 
             col = new TableViewerColumn(tableViewer, SWT.NONE);
             col.getColumn().setText(Messages.ColumnIssue);
@@ -225,7 +226,7 @@ public class ConsistencyChecksJob extends AbstractClientJob
                 }
             });
             layout.setColumnData(col.getColumn(), new ColumnPixelData(300));
-            ColumnViewerSorter.create(ReportedIssue.class, "label").attachTo(tableViewer, col); //$NON-NLS-1$
+            ColumnViewerSorter.create(ReportedIssue.class, DataType.OTHER_TEXT, "label").attachTo(tableViewer, col); //$NON-NLS-1$
 
             col = new TableViewerColumn(tableViewer, SWT.NONE);
             col.getColumn().setText(Messages.ColumnFix);

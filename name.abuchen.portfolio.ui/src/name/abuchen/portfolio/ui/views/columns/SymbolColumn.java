@@ -8,7 +8,6 @@ import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.StringEditingSupport;
 
 public class SymbolColumn extends Column
@@ -31,8 +30,7 @@ public class SymbolColumn extends Column
             }
         });
 
-        setSorter(ColumnViewerSorter.createIgnoreCase(
-                        e -> Adaptor.optionally(Security.class, e).map(Security::getTickerSymbol).orElse(null)));
+        setCompareBy(e -> Adaptor.optionally(Security.class, e).map(Security::getTickerSymbol).orElse(null));
 
         new StringEditingSupport(Security.class, "tickerSymbol") //$NON-NLS-1$
                         .setCanEditCheck(e -> Adaptor.optionally(Security.class, e).isPresent()).attachTo(this);
