@@ -12,7 +12,6 @@ import name.abuchen.portfolio.model.TransactionOwner;
 import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.Column;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.DateTimeLabelProvider;
 
 public class LastTransactionDateColumn extends Column implements Column.CacheInvalidationListener
@@ -24,7 +23,7 @@ public class LastTransactionDateColumn extends Column implements Column.CacheInv
         super("last-date", DataType.DATE, Messages.ColumnLastTransactionDate, SWT.RIGHT, 80); //$NON-NLS-1$
 
         setLabelProvider(new DateTimeLabelProvider(this::getOrCompute));
-        setSorter(ColumnViewerSorter.create(this::getOrCompute));
+        setCompareBy(this::getOrCompute);
         setVisible(false);
     }
 

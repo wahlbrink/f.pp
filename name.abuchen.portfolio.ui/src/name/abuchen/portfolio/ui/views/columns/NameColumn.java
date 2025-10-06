@@ -15,7 +15,6 @@ import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.LogoManager;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.ModificationListener;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.StringEditingSupport;
 import name.abuchen.portfolio.util.TextUtil;
 
@@ -114,10 +113,10 @@ public class NameColumn extends Column
                         && nameLabelProvider.getNamed == DEFAULT_GET_NAMED)
             nameLabelProvider.getNamed = getNamed;
         setLabelProvider(labelProvider);
-        setSorter(ColumnViewerSorter.createIgnoreCase((e) -> {
+        setCompareBy((e) -> {
             Named n = getNamed.apply(e);
             return (n != null) ? n.getName() : null;
-        }));
+        });
     }
 
     private void addEditingSupport(ModificationListener listener)

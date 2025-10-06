@@ -140,7 +140,8 @@ public class HistoricalPricesPane implements InformationPanePage
                 return hasMissing ? Colors.theme().warningBackground() : null;
             }
         });
-        ColumnViewerSorter.create(SecurityPrice.class, "date").attachTo(column, SWT.DOWN); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(SecurityPrice.class, column.getDataType(), "date")); //$NON-NLS-1$
+        column.setSortAsDefault();
         new DateEditingSupport(SecurityPrice.class, "date") //$NON-NLS-1$
                         .addListener((e, o, n) -> {
                             SecurityPrice price = (SecurityPrice) e;
@@ -161,7 +162,7 @@ public class HistoricalPricesPane implements InformationPanePage
                 return Values.Quote.format(security.getCurrencyCode(), price.getValue(), client.getBaseCurrency());
             }
         });
-        ColumnViewerSorter.create(SecurityPrice.class, "value").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(SecurityPrice.class, column.getDataType(), "value").attachTo(column); //$NON-NLS-1$
         new ValueEditingSupport(SecurityPrice.class, "value", Values.Quote, number -> number.longValue() != 0) //$NON-NLS-1$
                         .addListener((e, o, n) -> client.markDirty()).attachTo(column);
         support.addColumn(column);

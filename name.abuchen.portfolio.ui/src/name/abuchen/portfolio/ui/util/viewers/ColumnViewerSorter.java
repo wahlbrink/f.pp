@@ -28,6 +28,7 @@ import org.eclipse.swt.widgets.Widget;
 import name.abuchen.portfolio.model.Adaptor;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.Quote;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.PortfolioPlugin;
 import name.abuchen.portfolio.util.TextUtil;
 
@@ -201,9 +202,9 @@ public final class ColumnViewerSorter
 
     private static final class ValueProviderComparator implements Comparator<Object>
     {
-        private final Function<Object, Comparable<?>> valueProvider;
+        private final Function<Object, ? extends Comparable<?>> valueProvider;
 
-        public ValueProviderComparator(Function<Object, Comparable<?>> valueProvider)
+        public ValueProviderComparator(Function<Object, ? extends Comparable<?>> valueProvider)
         {
             this.valueProvider = valueProvider;
         }
@@ -383,50 +384,77 @@ public final class ColumnViewerSorter
         }
     }
 
-    private Comparator<Object> comparator;
-
-    private ColumnViewerSorter(Comparator<Object> comparator)
+    private static int getDefaultDirection(DataType dataType)
     {
-        this.comparator = comparator;
+        return switch (dataType)
+        {
+            case NAME, ISIN, WKN, TICKER_SYMBOL, TRANSACTION_TYPE, FUTURE_DATE, CURRENCY, IS_RETIRED, OTHER_ENUM, OTHER_TEXT, OTHER -> SWT.UP;
+            default -> SWT.DOWN;
+        };
     }
 
-    public static ColumnViewerSorter create(Class<?> clazz, String... attributes)
+    private Comparator<Object> comparator;
+
+    private int defaultDirection;
+
+    private ColumnViewerSorter(Comparator<Object> comparator, int defaultDirection)
+    {
+        this.comparator = comparator;
+        this.defaultDirection = defaultDirection;
+    }
+
+    public static ColumnViewerSorter create(Class<?> clazz, DataType dataType, String... attributes)
     {
         List<Comparator<Object>> comparators = new ArrayList<>();
 
         for (String attribute : attributes)
             comparators.add(new BeanComparator(clazz, attribute));
 
-        return new ColumnViewerSorter(
-                        comparators.size() == 1 ? comparators.get(0) : new ChainedComparator(comparators));
+        return new ColumnViewerSorter(comparators.size() == 1 ? comparators.get(0) : new ChainedComparator(comparators),
+                        getDefaultDirection(dataType));
     }
 
-    public static ColumnViewerSorter create(Function<Object, Comparable<?>> valueProvider)
+    public static ColumnViewerSorter createFor(DataType dataType,
+                    Function<Object, ? extends Comparable<?>> valueProvider)
     {
-        return create(new ValueProviderComparator(valueProvider));
+        @SuppressWarnings("unchecked")
+        Comparator<Object> comparator = switch (dataType)
+        {
+            case NAME, ISIN, WKN, TICKER_SYMBOL, CURRENCY, OTHER_TEXT ->
+                            new StringValueProviderComparator((Function<Object, String>) valueProvider);
+            default -> new ValueProviderComparator(valueProvider);
+        };
+        return create(comparator, dataType);
     }
 
     /**
      * Creates a sorter that takes the row element and the row option as an
      * input.
      */
-    public static ColumnViewerSorter createWithOption(ElementOptionFunction<Comparable<?>> valueProvider)
+    public static ColumnViewerSorter createWithOption(DataType dataType,
+                    ElementOptionFunction<Comparable<?>> valueProvider)
     {
         return create(new ValueProviderComparator(element -> {
             var option = ColumnViewerSorter.SortingContext.getColumnOption();
             return valueProvider.apply(element, option);
-        }));
+        }), dataType);
     }
 
-    public static ColumnViewerSorter createIgnoreCase(Function<Object, String> valueProvider)
+    public static ColumnViewerSorter createIgnoreCase(Function<Object, String> valueProvider, DataType dataType)
     {
-        return create(new StringValueProviderComparator(valueProvider));
+        return create(new StringValueProviderComparator(valueProvider), dataType);
     }
 
     @SuppressWarnings("unchecked")
-    public static ColumnViewerSorter create(Comparator<? extends Object> comparator)
+    public static ColumnViewerSorter create(Comparator<? extends Object> comparator, int defaultDirection)
     {
-        return new ColumnViewerSorter((Comparator<Object>) comparator);
+        return new ColumnViewerSorter((Comparator<Object>) comparator, defaultDirection);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static ColumnViewerSorter create(Comparator<? extends Object> comparator, DataType dataType)
+    {
+        return new ColumnViewerSorter((Comparator<Object>) comparator, getDefaultDirection(dataType));
     }
 
     public ColumnViewerSorter wrap(UnaryOperator<Comparator<Object>> provider)
@@ -435,14 +463,14 @@ public final class ColumnViewerSorter
         return this;
     }
 
+    public int getDefaultDirection()
+    {
+        return defaultDirection;
+    }
+
     public void attachTo(Column column)
     {
         column.setSorter(this);
-    }
-
-    public void attachTo(Column column, int direction)
-    {
-        column.setSorter(this, direction);
     }
 
     public void attachTo(ColumnViewer viewer, ViewerColumn column)
@@ -452,7 +480,7 @@ public final class ColumnViewerSorter
 
     public void attachTo(ColumnViewer viewer, ViewerColumn column, boolean makeDefault)
     {
-        attachTo(viewer, column, makeDefault ? SWT.UP : SWT.NONE);
+        attachTo(viewer, column, makeDefault ? defaultDirection : SWT.NONE);
     }
 
     public void attachTo(ColumnViewer viewer, ViewerColumn column, int direction)
@@ -462,4 +490,5 @@ public final class ColumnViewerSorter
         if (direction != SWT.NONE)
             x.setSorter(direction);
     }
+
 }

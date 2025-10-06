@@ -244,7 +244,7 @@ public final class SecuritiesTable implements ModificationListener
                 return ((Security) e).isRetired() ? Images.CHECK.image() : null;
             }
         });
-        column.setSorter(ColumnViewerSorter.create(Security.class, "retired")); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(Security.class, column.getDataType(), "retired")); //$NON-NLS-1$
         new BooleanEditingSupport(Security.class, "retired").addListener(this).attachTo(column); //$NON-NLS-1$
         column.setVisible(false);
         support.addColumn(column);
@@ -271,7 +271,7 @@ public final class SecuritiesTable implements ModificationListener
                                     getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> {
+        column.setComparator((o1, o2) -> {
             SecurityPrice p1 = ((Security) o1).getSecurityPrice(LocalDate.now());
             SecurityPrice p2 = ((Security) o2).getSecurityPrice(LocalDate.now());
 
@@ -281,7 +281,7 @@ public final class SecuritiesTable implements ModificationListener
                 return 1;
 
             return Long.compare(p1.getValue(), p2.getValue());
-        }));
+        });
         support.addColumn(column);
     }
 
@@ -321,7 +321,7 @@ public final class SecuritiesTable implements ModificationListener
                 return null;
             }
         }));
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> { // NOSONAR
+        column.setComparator((o1, o2) -> { // NOSONAR
 
             Optional<Pair<SecurityPrice, SecurityPrice>> previous1 = ((Security) o1).getLatestTwoSecurityPrices();
             Optional<Pair<SecurityPrice, SecurityPrice>> previous2 = ((Security) o2).getLatestTwoSecurityPrices();
@@ -342,7 +342,7 @@ public final class SecuritiesTable implements ModificationListener
             double v2 = (latestQuote2 - previousQuote2) / previousQuote2;
 
             return Double.compare(v1, v2);
-        }));
+        });
         support.addColumn(column);
     }
 
@@ -383,7 +383,7 @@ public final class SecuritiesTable implements ModificationListener
                 return null;
             }
         }));
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> { // NOSONAR
+        column.setComparator((o1, o2) -> { // NOSONAR
 
             Optional<Pair<SecurityPrice, SecurityPrice>> previous1 = ((Security) o1).getLatestTwoSecurityPrices();
             Optional<Pair<SecurityPrice, SecurityPrice>> previous2 = ((Security) o2).getLatestTwoSecurityPrices();
@@ -404,7 +404,7 @@ public final class SecuritiesTable implements ModificationListener
             double v2 = latestQuote2 - previousQuote2;
 
             return Double.compare(v1, v2);
-        }));
+        });
         support.addColumn(column);
     }
 
@@ -437,7 +437,7 @@ public final class SecuritiesTable implements ModificationListener
                 return latest.getDate().isBefore(sevenDaysAgo) ? Colors.theme().warningBackground() : null;
             }
         });
-        column.setSorter(ColumnViewerSorter.create(dataProvider::apply));
+        column.setCompareBy(dataProvider);
         support.addColumn(column);
     }
 
@@ -476,7 +476,7 @@ public final class SecuritiesTable implements ModificationListener
                     return null;
             }
         });
-        column.setSorter(ColumnViewerSorter.create(dataProvider::apply));
+        column.setCompareBy(dataProvider);
         support.addColumn(column);
     }
 
@@ -491,7 +491,7 @@ public final class SecuritiesTable implements ModificationListener
         column.setDescription(Messages.ColumnQuoteChange_Description);
         column.setLabelProvider(() -> new QuoteReportingPeriodLabelProvider());
         column.setVisible(false);
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> {
+        column.setComparator((o1, o2) -> {
             ReportingPeriod option = (ReportingPeriod) ColumnViewerSorter.SortingContext.getColumnOption();
 
             Double v1 = QuoteReportingPeriodLabelProvider.getQuoteChange((Security) o1, option);
@@ -505,7 +505,7 @@ public final class SecuritiesTable implements ModificationListener
                 return 1;
 
             return Double.compare(v1.doubleValue(), v2.doubleValue());
-        }));
+        });
         support.addColumn(column);
     }
 
@@ -540,7 +540,7 @@ public final class SecuritiesTable implements ModificationListener
                 return quoteFeed.apply(e);
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(quoteFeed::apply));
+        column.setCompareBy(quoteFeed);
         support.addColumn(column);
 
         Function<Object, String> latestQuoteFeed = e -> {
@@ -564,7 +564,7 @@ public final class SecuritiesTable implements ModificationListener
                 return latestQuoteFeed.apply(e);
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(latestQuoteFeed::apply));
+        column.setCompareBy(latestQuoteFeed);
         support.addColumn(column);
 
         column = new Column("url-history", DataType.OTHER_TEXT, Messages.ColumnFeedURLHistoric, SWT.LEFT, 200); //$NON-NLS-1$
@@ -579,7 +579,7 @@ public final class SecuritiesTable implements ModificationListener
                 return security.getFeedURL();
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(s -> ((Security) s).getFeedURL()));
+        column.setCompareBy(s -> ((Security) s).getFeedURL());
         support.addColumn(column);
 
         column = new Column("url-latest", DataType.OTHER_TEXT, Messages.ColumnFeedURLLatest, SWT.LEFT, 200); //$NON-NLS-1$
@@ -594,7 +594,7 @@ public final class SecuritiesTable implements ModificationListener
                 return security.getLatestFeedURL();
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(s -> ((Security) s).getLatestFeedURL()));
+        column.setCompareBy(s -> ((Security) s).getLatestFeedURL());
         support.addColumn(column);
     }
 
@@ -612,7 +612,7 @@ public final class SecuritiesTable implements ModificationListener
         };
 
         column.setLabelProvider(new DateLabelProvider(dataProvider));
-        column.setSorter(ColumnViewerSorter.create(dataProvider::apply));
+        column.setCompareBy(dataProvider);
         support.addColumn(column);
 
         column = new Column("qqm-completeness", DataType.OTHER_NUMBER, Messages.ColumnMetricCompleteness, SWT.RIGHT, //$NON-NLS-1$
@@ -628,7 +628,7 @@ public final class SecuritiesTable implements ModificationListener
                 return Values.Percent2.format(metricsCache.get((Security) e).getCompleteness());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(o -> metricsCache.get((Security) o).getCompleteness()));
+        column.setCompareBy(o -> metricsCache.get((Security) o).getCompleteness());
         support.addColumn(column);
 
         column = new Column("qqm-expected", DataType.OTHER_NUMBER, Messages.ColumnMetricExpectedNumberOfQuotes, //$NON-NLS-1$
@@ -643,7 +643,7 @@ public final class SecuritiesTable implements ModificationListener
                 return Integer.toString(metricsCache.get((Security) e).getExpectedNumberOfQuotes());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(o -> metricsCache.get((Security) o).getExpectedNumberOfQuotes()));
+        column.setCompareBy(o -> metricsCache.get((Security) o).getExpectedNumberOfQuotes());
         support.addColumn(column);
 
         column = new Column("qqm-actual", DataType.OTHER_NUMBER, Messages.ColumnMetricActualNumberOfQuotes, SWT.RIGHT, //$NON-NLS-1$
@@ -658,7 +658,7 @@ public final class SecuritiesTable implements ModificationListener
                 return Integer.toString(metricsCache.get((Security) e).getActualNumberOfQuotes());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(o -> metricsCache.get((Security) o).getActualNumberOfQuotes()));
+        column.setCompareBy(o -> metricsCache.get((Security) o).getActualNumberOfQuotes());
         support.addColumn(column);
 
         column = new Column("qqm-missing", DataType.OTHER_NUMBER, Messages.ColumnMetricNumberOfMissingQuotes, SWT.RIGHT, //$NON-NLS-1$
@@ -674,10 +674,10 @@ public final class SecuritiesTable implements ModificationListener
                 return Integer.toString(metrics.getExpectedNumberOfQuotes() - metrics.getActualNumberOfQuotes());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> {
+        column.setCompareBy(e -> {
             QuoteQualityMetrics metrics = metricsCache.get((Security) e);
             return metrics.getExpectedNumberOfQuotes() - metrics.getActualNumberOfQuotes();
-        }));
+        });
         support.addColumn(column);
     }
 

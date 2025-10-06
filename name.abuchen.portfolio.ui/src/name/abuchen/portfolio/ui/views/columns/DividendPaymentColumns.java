@@ -18,7 +18,6 @@ import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.Colors;
 import name.abuchen.portfolio.ui.util.viewers.Column;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.DateLabelProvider;
 
 public class DividendPaymentColumns
@@ -60,7 +59,7 @@ public class DividendPaymentColumns
                 return date == null || !date.equals(LocalDate.now()) ? null : Colors.theme().warningBackground();
             }
         });
-        column.setSorter(ColumnViewerSorter.create(dataProvider::apply));
+        column.setCompareBy(dataProvider);
         return column;
     }
 
@@ -97,7 +96,7 @@ public class DividendPaymentColumns
                 return date == null || !date.equals(LocalDate.now()) ? null : Colors.theme().warningBackground();
             }
         });
-        column.setSorter(ColumnViewerSorter.create(dataProvider::apply));
+        column.setCompareBy(dataProvider);
         return column;
     }
 
@@ -127,10 +126,10 @@ public class DividendPaymentColumns
                 return Values.Money.formatAlwaysVisible(amount, client.getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(element -> {
+        column.setCompareBy(element -> {
             Security security = Adaptor.adapt(Security.class, element);
             return security != null ? getPaymentAmount(now, security) : null;
-        }));
+        });
         return column;
     }
 
