@@ -75,7 +75,7 @@ public class DistanceFromAllTimeHighColumn extends Column
         this.setDescription(Messages.ColumnQuoteDistanceFromAthPercent_Description);
         this.setLabelProvider(() -> new QuoteReportingPeriodLabelProvider(valueProvider));
         this.setVisible(false);
-        this.setSorter(ColumnViewerSorter.create((o1, o2) -> {
+        setComparator((o1, o2) -> {
             ReportingPeriod option = (ReportingPeriod) ColumnViewerSorter.SortingContext.getColumnOption();
 
             var ath1 = valueProvider.apply(o1, option);
@@ -91,6 +91,6 @@ public class DistanceFromAllTimeHighColumn extends Column
                 return 1;
 
             return Double.compare(v1.doubleValue(), v2.doubleValue());
-        }));
+        });
     }
 }
