@@ -369,12 +369,12 @@ public class PerformanceView extends AbstractHistoricView
             return position.explain(ClientPerformanceSnapshot.Position.TRAIL_VALUE).map(MoneyTrailDataSource::new)
                             .orElseGet(() -> null);
         });
-        column.setSorter(ColumnViewerSorter.create(o -> {
+        column.setCompareBy(o -> {
             if (o instanceof ClientPerformanceSnapshot.Position pos)
                 return pos.getValue();
 
             return null;
-        }));
+        });
         support.addColumn(column);
 
         column = new Column("forex", DataType.MONEY, Messages.ColumnThereofForeignCurrencyGains, SWT.RIGHT, 80); //$NON-NLS-1$
@@ -502,7 +502,8 @@ public class PerformanceView extends AbstractHistoricView
                 return colorFor(element);
             }
         });
-        column.setSorter(ColumnViewerSorter.create(TransactionPair.BY_DATE), SWT.DOWN);
+        column.setComparator(TransactionPair.BY_DATE);
+        column.setSortAsDefault();
         support.addColumn(column);
 
         column = new Column(DataType.TRANSACTION_TYPE, Messages.ColumnTransactionType, SWT.LEFT, 100);
@@ -526,7 +527,7 @@ public class PerformanceView extends AbstractHistoricView
             Transaction t = ((TransactionPair<?>) e).getTransaction();
             return t instanceof AccountTransaction at ? at.getType().toString()
                             : ((PortfolioTransaction) t).getType().toString();
-        }));
+        }, column.getDataType()));
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80);
@@ -545,7 +546,7 @@ public class PerformanceView extends AbstractHistoricView
                 return colorFor(element);
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getMonetaryAmount()));
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getMonetaryAmount());
         support.addColumn(column);
 
         addTaxesColumn(support);
@@ -566,8 +567,7 @@ public class PerformanceView extends AbstractHistoricView
                 return ((TransactionPair<?>) element).getTransaction().getSource();
             }
         });
-        column.setSorter(ColumnViewerSorter
-                        .createIgnoreCase(e -> ((TransactionPair<?>) e).getTransaction().getSource()));
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getSource());
         column.setVisible(false);
         support.addColumn(column);
 
@@ -621,8 +621,7 @@ public class PerformanceView extends AbstractHistoricView
                 return colorFor(element);
             }
         });
-        column.setSorter(ColumnViewerSorter
-                        .create(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Unit.Type.TAX)));
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Unit.Type.TAX));
         support.addColumn(column);
     }
 
@@ -659,8 +658,7 @@ public class PerformanceView extends AbstractHistoricView
                 return colorFor(element);
             }
         });
-        column.setSorter(ColumnViewerSorter
-                        .create(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Unit.Type.FEE)));
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getUnitSum(Unit.Type.FEE));
         support.addColumn(column);
     }
 
@@ -752,7 +750,8 @@ public class PerformanceView extends AbstractHistoricView
                 return Values.Money.format(item.getDividends(), getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "dividends")); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, column.getDataType(),
+                        "dividends")); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnInterest, SWT.RIGHT, 80);
@@ -765,7 +764,8 @@ public class PerformanceView extends AbstractHistoricView
                 return Values.Money.format(item.getInterest(), getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "interest")); //$NON-NLS-1$
+        column.setSorter(
+                        ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, column.getDataType(), "interest")); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnEarnings, SWT.RIGHT, 80);
@@ -779,7 +779,7 @@ public class PerformanceView extends AbstractHistoricView
                 return Values.Money.format(item.getSum(), getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "sum")); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, column.getDataType(), "sum")); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80);
@@ -792,7 +792,7 @@ public class PerformanceView extends AbstractHistoricView
                 return Values.Money.format(item.getFees(), getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "fees")); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, column.getDataType(), "fees")); //$NON-NLS-1$
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80);
@@ -805,7 +805,7 @@ public class PerformanceView extends AbstractHistoricView
                 return Values.Money.format(item.getTaxes(), getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, "taxes")); //$NON-NLS-1$
+        column.setSorter(ColumnViewerSorter.create(GroupEarningsByAccount.Item.class, column.getDataType(), "taxes")); //$NON-NLS-1$
         support.addColumn(column);
 
         support.createColumns();

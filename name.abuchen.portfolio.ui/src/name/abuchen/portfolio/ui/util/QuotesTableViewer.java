@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Widget;
 
 import name.abuchen.portfolio.model.LatestSecurityPrice;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.ui.DataType;
 import name.abuchen.portfolio.ui.Messages;
 import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
@@ -44,8 +45,8 @@ public class QuotesTableViewer
 
         // for sorting purposes: if the element is a string (i.e. an error
         // message) then use the current date
-        ColumnViewerSorter
-                        .create(element -> element instanceof String ? LocalDate.now()
+        ColumnViewerSorter.createFor(DataType.DATE,
+                                       element -> element instanceof String ? LocalDate.now()
                                         : ((LatestSecurityPrice) element).getDate())
                         .attachTo(tableViewer, viewerColumn, SWT.DOWN);
 

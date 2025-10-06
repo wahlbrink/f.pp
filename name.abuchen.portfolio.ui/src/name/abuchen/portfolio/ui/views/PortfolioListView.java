@@ -227,7 +227,7 @@ public class PortfolioListView extends AbstractFinanceView implements Modificati
                 return p.getReferenceAccount() != null ? p.getReferenceAccount().getName() : null;
             }
         });
-        ColumnViewerSorter.create(Portfolio.class, "referenceAccount").attachTo(column); //$NON-NLS-1$
+        ColumnViewerSorter.create(Portfolio.class, column.getDataType(), "referenceAccount").attachTo(column); //$NON-NLS-1$
         new ListEditingSupport(Portfolio.class, "referenceAccount", getClient().getAccounts()) //$NON-NLS-1$
                         .addListener(this).attachTo(column);
         portfolioColumns.addColumn(column);
@@ -245,7 +245,7 @@ public class PortfolioListView extends AbstractFinanceView implements Modificati
             }
         });
         // add a sorter
-        column.setSorter(ColumnViewerSorter.create((o1, o2) -> {
+        column.setComparator((o1, o2) -> {
             CurrencyConverter converter = new CurrencyConverterImpl(factory, getClient().getBaseCurrency());
 
             PortfolioSnapshot p1 = PortfolioSnapshot.create((Portfolio) o1, converter, LocalDate.now());
@@ -257,7 +257,7 @@ public class PortfolioListView extends AbstractFinanceView implements Modificati
                 return 1;
 
             return p1.getValue().compareTo(p2.getValue());
-        }));
+        });
         portfolioColumns.addColumn(column);
 
         column = new Column("ref_cash_bal", DataType.MONEY, Messages.ColumnBalanceOfReferenceAccount, SWT.RIGHT, 100); //$NON-NLS-1$
@@ -271,8 +271,8 @@ public class PortfolioListView extends AbstractFinanceView implements Modificati
                 return Values.Amount.format((refAcc.getCurrentAmount(LocalDateTime.now().with(LocalTime.MAX))));
             }
         });
-        ColumnViewerSorter.create(o -> ((Portfolio) o).getReferenceAccount()
-                        .getCurrentAmount(LocalDateTime.now().with(LocalTime.MAX))).attachTo(column);
+        column.setCompareBy(o -> ((Portfolio) o).getReferenceAccount()
+                        .getCurrentAmount(LocalDateTime.now().with(LocalTime.MAX)));
         portfolioColumns.addColumn(column);
 
         column = new NoteColumn();

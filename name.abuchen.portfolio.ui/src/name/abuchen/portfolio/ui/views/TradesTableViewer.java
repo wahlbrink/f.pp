@@ -33,7 +33,6 @@ import name.abuchen.portfolio.ui.util.TabularDataSource;
 import name.abuchen.portfolio.ui.util.viewers.Column;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport;
 import name.abuchen.portfolio.ui.util.viewers.ColumnEditingSupport.TouchClientListener;
-import name.abuchen.portfolio.ui.util.viewers.ColumnViewerSorter;
 import name.abuchen.portfolio.ui.util.viewers.CopyPasteSupport;
 import name.abuchen.portfolio.ui.util.viewers.DateTimeLabelProvider;
 import name.abuchen.portfolio.ui.util.viewers.MoneyColorLabelProvider;
@@ -102,7 +101,8 @@ public class TradesTableViewer
 
         Column column = new Column("start", DataType.DATE, Messages.ColumnStartDate, SWT.None, 80); //$NON-NLS-1$
         column.setLabelProvider(new DateTimeLabelProvider(e -> ((Trade) e).getStart()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getStart()), SWT.DOWN);
+        column.setCompareBy(e -> ((Trade) e).getStart());
+        column.setSortAsDefault();
         support.addColumn(column);
 
         column = new Column("end", DataType.DATE, Messages.ColumnEndDate, SWT.None, 80); //$NON-NLS-1$
@@ -115,10 +115,10 @@ public class TradesTableViewer
                                 return ((Trade) e).isClosed() ? null : Colors.theme().warningBackground();
                             }
                         });
-        column.setSorter(ColumnViewerSorter.create(e -> {
+        column.setCompareBy(e -> {
             Optional<LocalDateTime> date = ((Trade) e).getEnd();
             return date.isPresent() ? date.get() : LocalDateTime.now().plusYears(1);
-        }));
+        });
         support.addColumn(column);
 
         column = new Column("tx", DataType.OTHER_NUMBER, Messages.ColumnNumberOfTransactions, SWT.RIGHT, 80); //$NON-NLS-1$
@@ -183,7 +183,7 @@ public class TradesTableViewer
                 });
             });
         });
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getTransactions().size()));
+        column.setCompareBy(e -> ((Trade) e).getTransactions().size());
         support.addColumn(column);
 
         column = new Column("shares", DataType.NUM_SHARES, Messages.ColumnShares, SWT.None, 80); //$NON-NLS-1$
@@ -196,7 +196,7 @@ public class TradesTableViewer
                 return t.getShares();
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getShares()));
+        column.setCompareBy(e -> ((Trade) e).getShares());
         support.addColumn(column);
 
         column = new Column("entryvalue", DataType.MONEY, Messages.ColumnEntryValue, SWT.RIGHT, 80); //$NON-NLS-1$
@@ -211,7 +211,7 @@ public class TradesTableViewer
                 return Values.Money.format(t.getEntryValue(), view.getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getEntryValue()));
+        column.setCompareBy(e -> ((Trade) e).getEntryValue());
         support.addColumn(column);
 
         column = new Column("entryvalue-mvavg", DataType.MONEY, //$NON-NLS-1$
@@ -228,7 +228,7 @@ public class TradesTableViewer
                 return Values.Money.format(t.getEntryValueMovingAverage(), view.getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getEntryValueMovingAverage()));
+        column.setCompareBy(e -> ((Trade) e).getEntryValueMovingAverage());
         column.setVisible(false);
         support.addColumn(column);
 
@@ -252,7 +252,7 @@ public class TradesTableViewer
                 return Values.Money.format(averagePurchasePrice.apply((Trade) e), view.getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> averagePurchasePrice.apply((Trade) e)));
+        column.setCompareBy(e -> averagePurchasePrice.apply((Trade) e));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -278,7 +278,7 @@ public class TradesTableViewer
                                 view.getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> averagePurchasePriceMovingAverage.apply((Trade) e)));
+        column.setCompareBy(e -> averagePurchasePriceMovingAverage.apply((Trade) e));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -293,7 +293,7 @@ public class TradesTableViewer
                 return Values.Money.format(t.getExitValue(), view.getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getExitValue()));
+        column.setCompareBy(e -> ((Trade) e).getExitValue());
         support.addColumn(column);
 
         Function<Trade, Money> averageSellPrice = t -> {
@@ -314,7 +314,7 @@ public class TradesTableViewer
                 return Values.Money.format(averageSellPrice.apply((Trade) e), view.getClient().getBaseCurrency());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> averageSellPrice.apply((Trade) e)));
+        column.setCompareBy(e -> averageSellPrice.apply((Trade) e));
         column.setVisible(false);
         support.addColumn(column);
 
@@ -323,7 +323,7 @@ public class TradesTableViewer
         column.setMenuLabel(Messages.ColumnProfitLoss + " (" + CostMethod.FIFO.getLabel() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
         column.setLabelProvider(
                         new MoneyColorLabelProvider(element -> ((Trade) element).getProfitLoss(), view.getClient()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getProfitLoss()));
+        column.setCompareBy(e -> ((Trade) e).getProfitLoss());
         support.addColumn(column);
 
         column = new Column("gpl", DataType.MONEY_DIFF, Messages.ColumnGrossProfitLoss, SWT.RIGHT, 80); //$NON-NLS-1$
@@ -331,7 +331,7 @@ public class TradesTableViewer
         column.setMenuLabel(Messages.ColumnGrossProfitLoss + " (" + CostMethod.FIFO.getLabel() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
         column.setLabelProvider(new MoneyColorLabelProvider(
                         element -> ((Trade) element).getProfitLossWithoutTaxesAndFees(), view.getClient()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getProfitLossWithoutTaxesAndFees()));
+        column.setCompareBy(e -> ((Trade) e).getProfitLossWithoutTaxesAndFees());
         column.setVisible(false);
         support.addColumn(column);
 
@@ -342,7 +342,7 @@ public class TradesTableViewer
         column.setMenuLabel(Messages.ColumnProfitLoss + " (" + CostMethod.MOVING_AVERAGE.getLabel() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
         column.setLabelProvider(new MoneyColorLabelProvider(element -> ((Trade) element).getProfitLossMovingAverage(),
                         view.getClient()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getProfitLossMovingAverage()));
+        column.setCompareBy(e -> ((Trade) e).getProfitLossMovingAverage());
         column.setVisible(false);
         support.addColumn(column);
 
@@ -354,7 +354,7 @@ public class TradesTableViewer
         column.setLabelProvider(new MoneyColorLabelProvider(
                         element -> ((Trade) element).getProfitLossMovingAverageWithoutTaxesAndFees(),
                         view.getClient()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getProfitLossMovingAverageWithoutTaxesAndFees()));
+        column.setCompareBy(e -> ((Trade) e).getProfitLossMovingAverageWithoutTaxesAndFees());
         column.setVisible(false);
         support.addColumn(column);
 
@@ -368,28 +368,27 @@ public class TradesTableViewer
                 return Long.toString(t.getHoldingPeriod());
             }
         });
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getHoldingPeriod()));
+        column.setCompareBy(e -> ((Trade) e).getHoldingPeriod());
         support.addColumn(column);
 
         column = new Column("latesttrade", DataType.DATE, Messages.ColumnLatestTrade, SWT.None, 80); //$NON-NLS-1$
         column.setLabelProvider(new DateTimeLabelProvider(
                         e -> ((Trade) e).getLastTransaction().getTransaction().getDateTime()));
-        column.setSorter(ColumnViewerSorter
-                        .create(e -> ((Trade) e).getLastTransaction().getTransaction().getDateTime()));
+        column.setCompareBy(e -> ((Trade) e).getLastTransaction().getTransaction().getDateTime());
         column.setVisible(false);
         support.addColumn(column);
 
         column = new Column("irr", DataType.OTHER_NUMBER, Messages.ColumnIRR, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setMenuLabel(Messages.ColumnIRR_MenuLabel);
         column.setLabelProvider(new NumberColorLabelProvider<>(Values.Percent2, t -> ((Trade) t).getIRR()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getIRR()));
+        column.setCompareBy(e -> ((Trade) e).getIRR());
         support.addColumn(column);
 
         column = new Column("return", DataType.OTHER_NUMBER, Messages.ColumnReturn, SWT.RIGHT, 80); //$NON-NLS-1$
         column.setGroupLabel(Messages.ColumnReturn);
         column.setMenuLabel(Messages.ColumnReturn + " (" + CostMethod.FIFO.getLabel() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
         column.setLabelProvider(new NumberColorLabelProvider<>(Values.Percent2, t -> ((Trade) t).getReturn()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getReturn()));
+        column.setCompareBy(e -> ((Trade) e).getReturn());
         column.setVisible(false);
         support.addColumn(column);
 
@@ -400,7 +399,7 @@ public class TradesTableViewer
         column.setMenuLabel(Messages.ColumnReturn + " (" + CostMethod.MOVING_AVERAGE.getLabel() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
         column.setLabelProvider(
                         new NumberColorLabelProvider<>(Values.Percent2, t -> ((Trade) t).getReturnMovingAverage()));
-        column.setSorter(ColumnViewerSorter.create(e -> ((Trade) e).getReturnMovingAverage()));
+        column.setCompareBy(e -> ((Trade) e).getReturnMovingAverage());
         column.setVisible(false);
         support.addColumn(column);
 
@@ -417,7 +416,7 @@ public class TradesTableViewer
                 return ((Trade) e).getPortfolio().getName();
             }
         });
-        column.setSorter(ColumnViewerSorter.createIgnoreCase(e -> ((Trade) e).getPortfolio().getName()));
+        column.setCompareBy(e -> ((Trade) e).getPortfolio().getName());
         column.setVisible(false);
         support.addColumn(column);
 
