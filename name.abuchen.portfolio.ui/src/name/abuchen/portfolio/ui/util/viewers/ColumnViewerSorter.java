@@ -258,17 +258,7 @@ public final class ColumnViewerSorter
             else if (o2 == null)
                 return 1;
 
-            String v1 = valueProvider.apply(o1);
-            String v2 = valueProvider.apply(o2);
-
-            if (v1 == null && v2 == null)
-                return 0;
-            else if (v1 == null)
-                return -1;
-            else if (v2 == null)
-                return 1;
-
-            return TextUtil.compare(v1, v2);
+            return TextUtil.compare(valueProvider.apply(o1), valueProvider.apply(o2));
         }
     }
 

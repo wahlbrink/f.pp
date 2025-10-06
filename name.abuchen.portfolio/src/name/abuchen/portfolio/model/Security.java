@@ -50,7 +50,7 @@ public final class Security implements Attributable, InvestmentVehicle
         @Override
         public int compare(Security s1, Security s2)
         {
-            if (s1 == null && s2 == null)
+            if (s1 == s2)
                 return 0;
             else if (s1 == null)
                 return -1;
