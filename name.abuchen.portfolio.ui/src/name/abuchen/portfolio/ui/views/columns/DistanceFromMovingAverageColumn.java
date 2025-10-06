@@ -161,7 +161,7 @@ public class DistanceFromMovingAverageColumn extends Column
         setLabelProvider(new SmaPeriodColumnLabelProvider(valueProvider));
         setVisible(false);
 
-        ColumnViewerSorter sorter = ColumnViewerSorter.create((o1, o2) -> {
+        setComparator((o1, o2) -> {
             Integer option = (Integer) ColumnViewerSorter.SortingContext.getColumnOption();
 
             Double v1 = valueProvider.apply(o1, option);
@@ -176,6 +176,5 @@ public class DistanceFromMovingAverageColumn extends Column
 
             return Double.compare(v1.doubleValue(), v2.doubleValue());
         });
-        setSorter(sorter);
     }
 }

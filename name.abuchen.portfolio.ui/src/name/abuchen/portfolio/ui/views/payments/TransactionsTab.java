@@ -127,10 +127,11 @@ public class TransactionsTab implements PaymentsTab
         Column column = new Column(DataType.DATE, Messages.ColumnDate, SWT.None, 80);
         column.setLabelProvider(new DateTimeLabelProvider(
                         element -> ((TransactionPair<?>) element).getTransaction().getDateTime()));
-        ColumnViewerSorter.create(TransactionPair.BY_DATE).attachTo(column, SWT.DOWN);
+        column.setComparator(TransactionPair.BY_DATE);
+        column.setSortAsDefault();
         support.addColumn(column);
 
-        Function<Object, Comparable<?>> tx2type = element -> ((TransactionPair<?>) element)
+        Function<Object, String> tx2type = element -> ((TransactionPair<?>) element)
                         .getTransaction() instanceof AccountTransaction
                                         ? ((AccountTransaction) ((TransactionPair<?>) element).getTransaction())
                                                         .getType().toString()
@@ -143,7 +144,7 @@ public class TransactionsTab implements PaymentsTab
             @Override
             public String getText(Object element)
             {
-                return (String) tx2type.apply(element);
+                return tx2type.apply(element);
             }
 
             @Override
@@ -152,7 +153,7 @@ public class TransactionsTab implements PaymentsTab
                 return colorFor(element);
             }
         });
-        ColumnViewerSorter.create(tx2type).attachTo(column);
+        ColumnViewerSorter.createIgnoreCase(tx2type, column.getDataType()).attachTo(column);
         support.addColumn(column);
 
         column = new NameColumn("securityName", Messages.ColumnSecurity, 250, model.getClient()); //$NON-NLS-1$
@@ -173,7 +174,7 @@ public class TransactionsTab implements PaymentsTab
                 return colorFor(element);
             }
         });
-        ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getShares()).attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getShares());
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnGrossValue, SWT.RIGHT, 80);
@@ -197,13 +198,11 @@ public class TransactionsTab implements PaymentsTab
                 return colorFor(element);
             }
         });
-        ColumnViewerSorter
-                        .create(element -> ((TransactionPair<?>) element).getTransaction() instanceof AccountTransaction
-                                        ? ((AccountTransaction) ((TransactionPair<?>) element).getTransaction())
-                                                        .getGrossValue()
-                                        : ((PortfolioTransaction) ((TransactionPair<?>) element).getTransaction())
-                                                        .getGrossValue())
-                        .attachTo(column);
+        column.setCompareBy(element -> ((TransactionPair<?>) element).getTransaction() instanceof AccountTransaction
+                        ? ((AccountTransaction) ((TransactionPair<?>) element).getTransaction())
+                                        .getGrossValue()
+                        : ((PortfolioTransaction) ((TransactionPair<?>) element).getTransaction())
+                                        .getGrossValue());
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnTaxes, SWT.RIGHT, 80);
@@ -226,13 +225,11 @@ public class TransactionsTab implements PaymentsTab
                 return colorFor(element);
             }
         });
-        ColumnViewerSorter
-                        .create(element -> ((TransactionPair<?>) element).getTransaction() instanceof AccountTransaction
-                                        ? ((AccountTransaction) ((TransactionPair<?>) element).getTransaction())
-                                                        .getUnitSum(Unit.Type.TAX)
-                                        : ((PortfolioTransaction) ((TransactionPair<?>) element).getTransaction())
-                                                        .getUnitSum(Unit.Type.TAX))
-                        .attachTo(column);
+        column.setCompareBy(element -> ((TransactionPair<?>) element).getTransaction() instanceof AccountTransaction
+                        ? ((AccountTransaction) ((TransactionPair<?>) element).getTransaction())
+                                        .getUnitSum(Unit.Type.TAX)
+                        : ((PortfolioTransaction) ((TransactionPair<?>) element).getTransaction())
+                                        .getUnitSum(Unit.Type.TAX));
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnFees, SWT.RIGHT, 80);
@@ -255,13 +252,11 @@ public class TransactionsTab implements PaymentsTab
                 return colorFor(element);
             }
         });
-        ColumnViewerSorter
-                        .create(element -> ((TransactionPair<?>) element).getTransaction() instanceof AccountTransaction
-                                        ? ((AccountTransaction) ((TransactionPair<?>) element).getTransaction())
-                                                        .getUnitSum(Unit.Type.FEE)
-                                        : ((PortfolioTransaction) ((TransactionPair<?>) element).getTransaction())
-                                                        .getUnitSum(Unit.Type.FEE))
-                        .attachTo(column);
+        column.setCompareBy(element -> ((TransactionPair<?>) element).getTransaction() instanceof AccountTransaction
+                        ? ((AccountTransaction) ((TransactionPair<?>) element).getTransaction())
+                                        .getUnitSum(Unit.Type.FEE)
+                        : ((PortfolioTransaction) ((TransactionPair<?>) element).getTransaction())
+                                        .getUnitSum(Unit.Type.FEE));
         support.addColumn(column);
 
         column = new Column(DataType.MONEY, Messages.ColumnAmount, SWT.RIGHT, 80);
@@ -280,7 +275,7 @@ public class TransactionsTab implements PaymentsTab
                 return colorFor(element);
             }
         });
-        ColumnViewerSorter.create(e -> ((TransactionPair<?>) e).getTransaction().getMonetaryAmount()).attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getMonetaryAmount());
         support.addColumn(column);
 
         column = new Column(DataType.NAME, Messages.ColumnOffsetAccount, SWT.None, 120);
@@ -299,7 +294,7 @@ public class TransactionsTab implements PaymentsTab
                 return LogoManager.instance().getDefaultColumnImage(owner, model.getClient().getSettings());
             }
         });
-        ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getOwner().toString()).attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getOwner().toString());
         support.addColumn(column);
 
         column = new NoteColumn(null, false);
@@ -314,8 +309,7 @@ public class TransactionsTab implements PaymentsTab
                 return ((TransactionPair<?>) element).getTransaction().getSource();
             }
         });
-        ColumnViewerSorter.createIgnoreCase(e -> ((TransactionPair<?>) e).getTransaction().getSource())
-                        .attachTo(column);
+        column.setCompareBy(e -> ((TransactionPair<?>) e).getTransaction().getSource());
         column.setVisible(false);
         support.addColumn(column);
     }
