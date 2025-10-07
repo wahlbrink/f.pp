@@ -11,8 +11,8 @@ import org.eclipse.swtchart.IAxis.Position;
 import org.eclipse.swtchart.ICustomPaintListener;
 import org.eclipse.swtchart.ILineSeries;
 import org.eclipse.swtchart.ISeries.SeriesType;
-import org.eclipse.swtchart.internal.PlotArea;
 import org.eclipse.swtchart.LineStyle;
+import org.eclipse.swtchart.internal.PlotArea;
 
 import name.abuchen.portfolio.ui.UIConstants;
 import name.abuchen.portfolio.ui.util.Colors;
@@ -69,7 +69,7 @@ public class ScatterChart extends Chart // NOSONAR
 
         new ScatterChartToolTip(this);
 
-        ZoomMouseWheelListener.attachTo(this);
+        ZoomMouseWheelListener.attachTo(this, true);
         MovePlotKeyListener.attachTo(this);
         ZoomInAreaListener.attachTo(this);
         getPlotArea().getControl().addTraverseListener(event -> event.doit = true);

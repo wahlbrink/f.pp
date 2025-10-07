@@ -128,7 +128,7 @@ public class TimelineChart extends Chart // NOSONAR
 
         chartTools = new ChartToolsManager(this);
 
-        ZoomMouseWheelListener.attachTo(this);
+        ZoomMouseWheelListener.attachTo(this, true);
         MovePlotKeyListener.attachTo(this);
         ZoomInAreaListener.attachTo(this);
         getPlotArea().getControl().addTraverseListener(event -> event.doit = true);
