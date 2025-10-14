@@ -13,6 +13,7 @@ import jakarta.inject.Inject;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -62,7 +63,9 @@ import name.abuchen.portfolio.util.TextUtil;
     {
         Composite container = new Composite(parent, SWT.NONE);
         container.setBackground(parent.getBackground());
-        GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 5).applyTo(container);
+        GridLayout layout = GridLayoutFactory.fillDefaults().numColumns(2).margins(5, 5).create();
+        layout.verticalSpacing = 0;
+        container.setLayout(layout);
 
         title = new Label(container, SWT.NONE);
         title.setText(TextUtil.tooltip(getWidget().getLabel()));

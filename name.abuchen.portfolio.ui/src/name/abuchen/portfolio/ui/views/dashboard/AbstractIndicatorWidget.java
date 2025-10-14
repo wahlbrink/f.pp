@@ -8,6 +8,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -44,7 +45,9 @@ public abstract class AbstractIndicatorWidget<D> extends WidgetDelegate<D>
         Composite container = new Composite(parent, SWT.NONE);
         container.setBackground(parent.getBackground());
         container.setData(UIConstants.CSS.CLASS_NAME, this.getContainerCssClassNames());
-        GridLayoutFactory.fillDefaults().numColumns(1).margins(5, 5).applyTo(container);
+        GridLayout layout = GridLayoutFactory.fillDefaults().numColumns(1).margins(5, 5).create();
+        layout.verticalSpacing = 0;
+        container.setLayout(layout);
 
         title = new Label(container, SWT.NONE);
         title.setText(TextUtil.tooltip(getWidget().getLabel()));
