@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -46,7 +47,9 @@ public class ExchangeRateWidget extends WidgetDelegate<Object>
     {
         Composite container = new Composite(parent, SWT.NONE);
         container.setBackground(parent.getBackground());
-        GridLayoutFactory.fillDefaults().numColumns(1).margins(5, 5).applyTo(container);
+        GridLayout layout = GridLayoutFactory.fillDefaults().numColumns(1).margins(5, 5).create();
+        layout.verticalSpacing = 0;
+        container.setLayout(layout);
 
         title = new Label(container, SWT.NONE);
         title.setText(TextUtil.tooltip(getWidget().getLabel()));
