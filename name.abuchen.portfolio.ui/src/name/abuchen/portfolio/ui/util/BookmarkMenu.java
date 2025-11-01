@@ -2,6 +2,7 @@ package name.abuchen.portfolio.ui.util;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -38,6 +39,11 @@ public class BookmarkMenu extends MenuManager
 
     private void addDefaultPages()
     {
+        if (securities.size() > 10)
+        {
+            return;
+        }
+
         for (Bookmark bookmark : client.getSettings().getBookmarks())
         {
             if (bookmark.isSeparator())
@@ -46,18 +52,32 @@ public class BookmarkMenu extends MenuManager
             }
             else
             {
-                add(new SimpleAction(bookmark.getLabel(), a -> securities.stream().limit(10)
+                add(new SimpleAction(bookmark.getLabel(), a -> securities.stream()
                                 .forEach(s -> DesktopAPI.browse(bookmark.constructURL(client, s)))));
             }
         }
 
-        // display urls out of security notes only when single security is
-        // selected
+        add(new Separator());
         if (securities.size() == 1)
         {
-            add(new Separator());
-            securities.forEach(s -> s.getCustomBookmarks().forEach(
+            securities.forEach(s -> s.getCustomBookmarks(client).forEach(
                             bm -> add(new SimpleAction(bm.getLabel(), a -> DesktopAPI.browse(bm.getPattern())))));
+        }
+        else
+        {
+            client.getSettings().getAttributeTypes().filter((t) -> t.getType() == Bookmark.class)
+                            .forEachOrdered((t) -> {
+                                var bookmarks = securities.stream().map(s -> (Bookmark) s.getAttributes().get(t))
+                                                .filter(Objects::nonNull).toList();
+                                if (!bookmarks.isEmpty())
+                                {
+                                    String name = (bookmarks.size() < securities.size())
+                                                    ? String.format("%1$s (%2$s)", t.getName(), bookmarks.size()) //$NON-NLS-1$
+                                                    : t.getName();
+                                    add(new SimpleAction(name, a -> bookmarks
+                                                    .forEach(bookmark -> DesktopAPI.browse(bookmark.getPattern()))));
+                                }
+                            });
         }
 
         add(new Separator());
@@ -68,7 +88,7 @@ public class BookmarkMenu extends MenuManager
         List<Bookmark> templates = ClientSettings.getDefaultBookmarks();
         Collections.sort(templates, (r, l) -> r.getLabel().compareTo(l.getLabel()));
         templates.forEach(bookmark -> templatesMenu.add(new SimpleAction(bookmark.getLabel(),
-                        a -> securities.stream().limit(10)
+                        a -> securities.stream()
                                         .forEach(s -> DesktopAPI.browse(bookmark.constructURL(client, s))))));
 
         add(new Separator());
