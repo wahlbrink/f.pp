@@ -276,6 +276,7 @@
   <commands xmi:id="_tukxoBiQEeOR1rNFCzC82A" elementId="name.abuchen.portfolio.ui.command.updatequotes" commandName="%command.updateQuotes.label">
     <parameters xmi:id="_L7VRQApDEeqsXLK6ns2Lug" elementId="name.abuchen.portfolio.ui.param.filter" name="filter"/>
     <parameters xmi:id="_WatchlistNameParam" elementId="name.abuchen.portfolio.ui.param.watchlist" name="watchlist"/>
+    <parameters xmi:id="_OverwriteParam" elementId="name.abuchen.portfolio.ui.param.overwrite" name="overwrite"/>
   </commands>
   <commands xmi:id="_59FgcBiREeOR1rNFCzC82A" elementId="name.abuchen.portfolio.ui.command.updateproduct" commandName="updateProductCommand"/>
   <commands xmi:id="_Vr7H8B3VEeOYjJVcrtNJyA" elementId="org.eclipse.ui.help.aboutAction" commandName="aboutCommand"/>

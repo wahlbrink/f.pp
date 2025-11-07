@@ -585,7 +585,7 @@ public class ClientInput
             var predicate = config.getPredicate(converter, client);
 
             Job initialQuoteUpdate = new UpdatePricesJob(client, predicate,
-                            EnumSet.of(UpdatePricesJob.Target.LATEST, UpdatePricesJob.Target.HISTORIC));
+                            EnumSet.of(UpdatePricesJob.Target.LATEST, UpdatePricesJob.Target.HISTORIC), false);
             initialQuoteUpdate.schedule(1000);
 
             var checkInvestmentPlans = new CreateInvestmentPlanTxJob(client, exchangeRateProviderFacory);

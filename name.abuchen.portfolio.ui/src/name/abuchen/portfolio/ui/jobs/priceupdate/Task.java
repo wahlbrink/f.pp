@@ -16,16 +16,21 @@ abstract class Task
 {
     static class HistoricalTask extends Task
     {
-        public HistoricalTask(String groupingCriterion, QuoteFeed feed, FeedUpdateStatus status, Security security)
+
+        private final boolean overwriteExisting;
+
+        public HistoricalTask(String groupingCriterion, QuoteFeed feed, FeedUpdateStatus status, Security security,
+                        boolean overwriteExisting)
         {
             super(groupingCriterion, feed, status, security);
+            this.overwriteExisting = overwriteExisting;
         }
 
         @Override
         public UpdateStatus update() throws QuoteFeedException
         {
             var data = feed.getHistoricalQuotes(security, false);
-            var isDirty = security.addAllPrices(data.getPrices());
+            var isDirty = security.addAllPrices(data.getPrices(), overwriteExisting);
 
             if (!data.getErrors().isEmpty())
                 PortfolioPlugin.log(createErrorStatus(security.getName(), data.getErrors()));

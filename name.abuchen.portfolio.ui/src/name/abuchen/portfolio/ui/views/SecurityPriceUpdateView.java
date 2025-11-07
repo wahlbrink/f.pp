@@ -158,6 +158,9 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
         toolBar.add(new Separator());
 
         toolBar.add(new DropDown(Messages.JobLabelUpdateQuotes, manager -> {
+            var selection = selectionService.getSelection(getClient());
+            Action action;
+
             manager.add(CommandAction.forCommand(getContext(), Messages.JobLabelUpdateQuotes,
                             UIConstants.Command.UPDATE_QUOTES));
 
@@ -171,14 +174,13 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                             UIConstants.Command.UPDATE_QUOTES, //
                             UIConstants.Parameter.FILTER, UpdateQuotesHandler.FilterType.HOLDINGS.name()));
 
-            var selection = selectionService.getSelection(getClient());
-            var selectionMenu = CommandAction.forCommand(getContext(),
+            action = CommandAction.forCommand(getContext(),
                             MessageFormat.format(Messages.MenuUpdatePricesForSelectedInstruments,
                                             selection.isPresent() ? selection.get().getSecurities().size() : 0),
                             UIConstants.Command.UPDATE_QUOTES, //
                             UIConstants.Parameter.FILTER, UpdateQuotesHandler.FilterType.SECURITY.name());
-            selectionMenu.setEnabled(selection.isPresent() && !selection.get().getSecurities().isEmpty());
-            manager.add(selectionMenu);
+            action.setEnabled(selection.isPresent() && !selection.get().getSecurities().isEmpty());
+            manager.add(action);
 
             var watchlistMenu = new MenuManager(
                             BundleMessages.getString(BundleMessages.Label.Command.updateQuotesWatchlist));
@@ -190,6 +192,26 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                                 UIConstants.Parameter.WATCHLIST, watchlist.getName()));
             }
             manager.add(watchlistMenu);
+
+            manager.add(new Separator());
+
+            manager.add(CommandAction.forCommand(getContext(),
+                            BundleMessages.getString(BundleMessages.Label.Command.updateQuotesActiveSecurities)
+                                    + " • Overwrite Existing",
+                            UIConstants.Command.UPDATE_QUOTES, //
+                            UIConstants.Parameter.FILTER, UpdateQuotesHandler.FilterType.ACTIVE.name(),
+                            UIConstants.Parameter.OVERWRITE, "true")); //$NON-NLS-1$
+
+            action = CommandAction.forCommand(getContext(),
+                            MessageFormat.format(
+                                            Messages.MenuUpdatePricesForSelectedInstruments,
+                                            selection.isPresent() ? selection.get().getSecurities().size() : 0)
+                                    + " • Overwrite Existing",
+                            UIConstants.Command.UPDATE_QUOTES, //
+                            UIConstants.Parameter.FILTER, UpdateQuotesHandler.FilterType.SECURITY.name(),
+                            UIConstants.Parameter.OVERWRITE, "true"); //$NON-NLS-1$
+            action.setEnabled(selection.isPresent() && !selection.get().getSecurities().isEmpty());
+            manager.add(action);
         }));
 
         toolBar.add(new Separator());
