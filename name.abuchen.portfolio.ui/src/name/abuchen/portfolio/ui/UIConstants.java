@@ -111,6 +111,7 @@ public interface UIConstants
         String TYPE = "name.abuchen.portfolio.ui.param.type"; //$NON-NLS-1$
         String FILTER = "name.abuchen.portfolio.ui.param.filter"; //$NON-NLS-1$
         String WATCHLIST = "name.abuchen.portfolio.ui.param.watchlist"; //$NON-NLS-1$
+        String OVERWRITE = "name.abuchen.portfolio.ui.param.overwrite"; //$NON-NLS-1$
     }
 
     /**

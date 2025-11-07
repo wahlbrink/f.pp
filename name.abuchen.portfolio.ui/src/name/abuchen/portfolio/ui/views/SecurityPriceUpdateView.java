@@ -190,6 +190,13 @@ public class SecurityPriceUpdateView extends AbstractFinanceView implements Pric
                                 UIConstants.Parameter.WATCHLIST, watchlist.getName()));
             }
             manager.add(watchlistMenu);
+
+            manager.add(new Separator());
+
+            manager.add(CommandAction.forCommand(getContext(), Messages.JobLabelUpdateQuotes + " • Overwrite Existing",
+                            UIConstants.Command.UPDATE_QUOTES, //
+                            UIConstants.Parameter.OVERWRITE, "true")); //$NON-NLS-1$
+
         }));
 
         toolBar.add(new Separator());
