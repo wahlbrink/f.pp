@@ -88,7 +88,7 @@ public class HistoricalTaskTest
                         new TestQuoteFeed(EurostatHICPQuoteFeed.ID, data,
                                         QuoteFeed.HistoricalUpdatePolicy.REPLACE_IF_SOURCE_CHANGED,
                                         Optional.of(EurostatHICPQuoteFeed.DATASET_VERSION)),
-                        new FeedUpdateStatus(UpdateStatus.WAITING), security);
+                        new FeedUpdateStatus(UpdateStatus.WAITING), security, false);
 
         var result = task.update();
 
@@ -113,7 +113,7 @@ public class HistoricalTaskTest
                         new TestQuoteFeed(EurostatHICPQuoteFeed.ID, data,
                                         QuoteFeed.HistoricalUpdatePolicy.REPLACE_IF_SOURCE_CHANGED,
                                         Optional.of(EurostatHICPQuoteFeed.DATASET_VERSION)),
-                        new FeedUpdateStatus(UpdateStatus.WAITING), security);
+                        new FeedUpdateStatus(UpdateStatus.WAITING), security, false);
 
         var result = task.update();
 
@@ -142,7 +142,7 @@ public class HistoricalTaskTest
                         new TestQuoteFeed(EurostatHICPQuoteFeed.ID, data,
                                         QuoteFeed.HistoricalUpdatePolicy.REPLACE_IF_SOURCE_CHANGED,
                                         Optional.of(EurostatHICPQuoteFeed.DATASET_VERSION)),
-                        new FeedUpdateStatus(UpdateStatus.WAITING), security);
+                        new FeedUpdateStatus(UpdateStatus.WAITING), security, false);
 
         var result = task.update();
 
@@ -167,7 +167,7 @@ public class HistoricalTaskTest
 
         var task = new Task.HistoricalTask("group",
                         new TestQuoteFeed("TEST", data, QuoteFeed.HistoricalUpdatePolicy.REPLACE, Optional.empty()),
-                        new FeedUpdateStatus(UpdateStatus.WAITING), security);
+                        new FeedUpdateStatus(UpdateStatus.WAITING), security, false);
 
         var result = task.update();
 
@@ -192,7 +192,7 @@ public class HistoricalTaskTest
 
         var task = new Task.HistoricalTask("group",
                         new TestQuoteFeed("TEST", data, QuoteFeed.HistoricalUpdatePolicy.REPLACE, Optional.empty()),
-                        new FeedUpdateStatus(UpdateStatus.WAITING), security);
+                        new FeedUpdateStatus(UpdateStatus.WAITING), security, false);
 
         var result = task.update();
 

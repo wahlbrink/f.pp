@@ -486,7 +486,7 @@ public final class Security implements Attributable, InvestmentVehicle
      * some quote provider include the latest security price in the list of
      * historical prices.
      */
-    public boolean addAllPrices(List<SecurityPrice> newPrices)
+    public boolean addAllPrices(List<SecurityPrice> newPrices, boolean overwriteExisting)
     {
         if (newPrices.isEmpty())
             return false;
@@ -502,7 +502,7 @@ public final class Security implements Attributable, InvestmentVehicle
         {
             if (!p.getDate().isAfter(now))
             {
-                boolean doOverwrite = p.getDate().equals(last);
+                boolean doOverwrite = (overwriteExisting || p.getDate().equals(last));
                 boolean isAdded = addPrice(p, doOverwrite);
                 isUpdated = isUpdated || isAdded;
             }
