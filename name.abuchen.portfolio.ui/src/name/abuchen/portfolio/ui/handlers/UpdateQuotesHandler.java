@@ -55,22 +55,24 @@ public class UpdateQuotesHandler
     public void execute(@Named(IServiceConstants.ACTIVE_PART) MPart part,
                     @Named(IServiceConstants.ACTIVE_SHELL) Shell shell, SelectionService selectionService,
                     @Named(UIConstants.Parameter.FILTER) @Optional String filter,
-                    @Named(UIConstants.Parameter.WATCHLIST) @Optional String watchlist)
+                    @Named(UIConstants.Parameter.WATCHLIST) @Optional String watchlist,
+                    @Named(UIConstants.Parameter.OVERWRITE) @Optional String overwrite)
     {
         MenuHelper.getActiveClientInput(part, false).ifPresent(clientInput -> {
             var client = clientInput.getClient();
+            boolean overwriteMode = Boolean.parseBoolean(overwrite);
 
             if (FilterType.SECURITY.name().equalsIgnoreCase(filter))
             {
                 selectionService.getSelection(client).ifPresent(s -> {
-                    new UpdatePricesJob(client, s.getSecurities()).schedule();
+                    new UpdatePricesJob(client, s.getSecurities(), overwriteMode).schedule();
                     new UpdateDividendsJob(client, s.getSecurities()).schedule(5000);
                 });
             }
             else if (FilterType.ACTIVE.name().equalsIgnoreCase(filter))
             {
-                new UpdatePricesJob(client, s -> !s.isRetired(), EnumSet.allOf(UpdatePricesJob.Target.class))
-                                .schedule();
+                new UpdatePricesJob(client, s -> !s.isRetired(), EnumSet.allOf(UpdatePricesJob.Target.class),
+                                overwriteMode).schedule();
                 new UpdateDividendsJob(client, s -> !s.isRetired()).schedule(5000);
             }
             else if (FilterType.WATCHLIST.name().equalsIgnoreCase(filter) && watchlist != null)
@@ -79,7 +81,7 @@ public class UpdateQuotesHandler
                                 .filter(w -> w.getName().equals(watchlist)) //
                                 .findFirst().ifPresent(w -> {
                                     var securities = w.getSecurities();
-                                    new UpdatePricesJob(client, securities).schedule();
+                                    new UpdatePricesJob(client, securities, overwriteMode).schedule();
                                     new UpdateDividendsJob(client, securities).schedule(5000);
                                 });
             }
@@ -91,12 +93,12 @@ public class UpdateQuotesHandler
                 var securities = snapshot.getJointPortfolio().getPositions().stream().map(p -> p.getSecurity())
                                 .toList();
 
-                new UpdatePricesJob(client, securities).schedule();
+                new UpdatePricesJob(client, securities, overwriteMode).schedule();
                 new UpdateDividendsJob(client, securities).schedule(5000);
             }
             else
             {
-                new UpdatePricesJob(client, EnumSet.allOf(UpdatePricesJob.Target.class)).schedule();
+                new UpdatePricesJob(client, EnumSet.allOf(UpdatePricesJob.Target.class), overwriteMode).schedule();
                 new UpdateDividendsJob(client).schedule(5000);
             }
         });

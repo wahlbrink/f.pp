@@ -52,32 +52,39 @@ public class UpdatePricesJob extends AbstractClientJob
 
     private final Set<Target> target;
     private final Predicate<Security> filter;
+    private final boolean overwrite;
 
     private boolean suppressAuthenticationDialog = false;
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    public UpdatePricesJob(Client client, Set<Target> target)
+    public UpdatePricesJob(Client client, Set<Target> target, boolean overwrite)
     {
-        this(client, s -> true, target);
+        this(client, s -> true, target, overwrite);
     }
 
     public UpdatePricesJob(Client client, Security security)
     {
-        this(client, s -> s.equals(security), EnumSet.allOf(Target.class));
+        this(client, s -> s.equals(security), EnumSet.allOf(Target.class), false);
+    }
+
+    public UpdatePricesJob(Client client, List<Security> securities, boolean overwrite)
+    {
+        this(client, securities::contains, EnumSet.allOf(Target.class), overwrite);
     }
 
     public UpdatePricesJob(Client client, List<Security> securities)
     {
-        this(client, securities::contains, EnumSet.allOf(Target.class));
+        this(client, securities::contains, EnumSet.allOf(Target.class), false);
     }
 
-    public UpdatePricesJob(Client client, Predicate<Security> filter, Set<Target> target)
+    public UpdatePricesJob(Client client, Predicate<Security> filter, Set<Target> target, boolean overwrite)
     {
         super(client, Messages.JobLabelUpdateQuotes);
 
         this.target = target;
         this.filter = filter;
+        this.overwrite = overwrite;
     }
 
     public void suppressAuthenticationDialog(boolean suppressAuthenticationDialog)
@@ -206,7 +213,7 @@ public class UpdatePricesJob extends AbstractClientJob
             else
             {
                 var groupingCriterion = feed.getGroupingCriterion(security);
-                tasks.add(new HistoricalTask(groupingCriterion, feed, status, security));
+                tasks.add(new HistoricalTask(groupingCriterion, feed, status, security, overwrite));
             }
         }
 
