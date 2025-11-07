@@ -8,8 +8,8 @@ import org.eclipse.core.runtime.Status;
 
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.SecurityProperty;
-import name.abuchen.portfolio.online.QuoteFeed.HistoricalUpdatePolicy;
 import name.abuchen.portfolio.online.QuoteFeed;
+import name.abuchen.portfolio.online.QuoteFeed.HistoricalUpdatePolicy;
 import name.abuchen.portfolio.online.QuoteFeedData;
 import name.abuchen.portfolio.online.QuoteFeedException;
 import name.abuchen.portfolio.ui.PortfolioPlugin;
@@ -19,9 +19,14 @@ abstract class Task
 {
     static class HistoricalTask extends Task
     {
-        public HistoricalTask(String groupingCriterion, QuoteFeed feed, FeedUpdateStatus status, Security security)
+
+        private final boolean overwriteExisting;
+
+        public HistoricalTask(String groupingCriterion, QuoteFeed feed, FeedUpdateStatus status, Security security,
+                        boolean overwriteExisting)
         {
             super(groupingCriterion, feed, status, security);
+            this.overwriteExisting = overwriteExisting;
         }
 
         @Override
@@ -56,21 +61,21 @@ abstract class Task
             if (updatePolicy == HistoricalUpdatePolicy.REPLACE_IF_SOURCE_CHANGED)
                 return applyReplaceIfSourceChanged(data);
 
-            return security.addAllPrices(data.getPrices());
+            return security.addAllPrices(data.getPrices(), overwriteExisting);
         }
 
         private boolean applyReplaceIfSourceChanged(QuoteFeedData data)
         {
             var currentIdentity = feed.getHistoricalDataIdentity(security);
             if (currentIdentity.isEmpty())
-                return security.addAllPrices(data.getPrices());
+                return security.addAllPrices(data.getPrices(), overwriteExisting);
 
             String storedIdentity = security
                             .getPropertyValue(SecurityProperty.Type.FEED, QuoteFeed.HISTORICAL_DATA_IDENTITY)
                             .orElse(null);
 
             if (currentIdentity.get().equals(storedIdentity))
-                return security.addAllPrices(data.getPrices());
+                return security.addAllPrices(data.getPrices(), overwriteExisting);
 
             return replaceHistoricalQuotes(data, currentIdentity.get());
         }
@@ -83,7 +88,7 @@ abstract class Task
             boolean hadExistingPrices = !security.getPrices().isEmpty();
             security.removeAllPrices();
 
-            boolean isDirty = security.addAllPrices(data.getPrices()) || hadExistingPrices;
+            boolean isDirty = security.addAllPrices(data.getPrices(), false) || hadExistingPrices;
             if (security.setPropertyValue(SecurityProperty.Type.FEED, QuoteFeed.HISTORICAL_DATA_IDENTITY, identity))
                 isDirty = true;
 
