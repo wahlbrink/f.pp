@@ -12,6 +12,8 @@
       </vmArgs>
       <vmArgsLin>-Djdk.gtk.version=3
       </vmArgsLin>
+      <vmArgsWin>-Dswt.autoScale.updateOnRuntime=true
+      </vmArgsWin>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
       </vmArgsMac>
    </launcherArgs>
