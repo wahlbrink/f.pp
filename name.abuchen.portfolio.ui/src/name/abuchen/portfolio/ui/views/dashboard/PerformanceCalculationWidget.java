@@ -89,7 +89,7 @@ public class PerformanceCalculationWidget extends WidgetDelegate<ClientPerforman
             boolean omitRows = positions.size() > MAX_NO_OF_ROWS + 1;
 
             Composite table = new Composite(parent, SWT.NONE);
-            GridLayoutFactory.fillDefaults().numColumns(3).margins(10, 10).applyTo(table);
+            GridLayoutFactory.fillDefaults().numColumns(3).spacing(8, 5).applyTo(table);
 
             if (omitRows)
             {

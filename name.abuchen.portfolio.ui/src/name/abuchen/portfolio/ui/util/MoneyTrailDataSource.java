@@ -34,7 +34,7 @@ public class MoneyTrailDataSource
 
         Composite composite = new Composite(parent, SWT.NONE);
         composite.setBackground(Colors.INFO_TOOLTIP_BACKGROUND);
-        GridLayoutFactory.swtDefaults().numColumns(depth + 3).applyTo(composite);
+        GridLayoutFactory.swtDefaults().numColumns(depth + 3).spacing(8, 5).applyTo(composite);
 
         Label heading = new Label(composite, SWT.NONE);
         heading.setBackground(composite.getBackground());
