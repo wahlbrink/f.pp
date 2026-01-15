@@ -250,7 +250,9 @@ public class TimelineChartToolTip extends AbstractChartToolTip
         hintData.widthHint = hint.getBounds().width;
         hint.getParent().pack();
         hint.setFont(this.resourceManager
-                        .create(FontDescriptor.createFrom(data.getFont()).increaseHeight(-3).withStyle(SWT.ITALIC)));
+                        .create(FontDescriptor.createFrom(data.getFont())
+                                        .increaseHeight(-(data.getFont().getFontData()[0].getHeight() / 4))
+                                        .withStyle(SWT.ITALIC)));
     }
 
     private List<Pair<ISeries<?>, Double>> computeValues(ISeries<?>[] allSeries)
