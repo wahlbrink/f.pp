@@ -21,6 +21,7 @@ import name.abuchen.portfolio.money.CurrencyConverter;
 import name.abuchen.portfolio.money.Money;
 import name.abuchen.portfolio.money.MoneyCollectors;
 import name.abuchen.portfolio.money.Values;
+import name.abuchen.portfolio.util.TextUtil;
 
 public abstract class Transaction implements Annotated, Adaptable
 {
@@ -214,7 +215,7 @@ public abstract class Transaction implements Annotated, Adaptable
             if (compareTo != 0)
                 return compareTo;
 
-            compareTo = Long.compare(t1.getAmount(), t2.getAmount());
+            compareTo = compare(t1.getSecurity(), t2.getSecurity());
             if (compareTo != 0)
                 return compareTo;
 
@@ -225,8 +226,29 @@ public abstract class Transaction implements Annotated, Adaptable
                     return compareTo;
             }
 
+            compareTo = Long.compare(t1.getAmount(), t2.getAmount());
+            if (compareTo != 0)
+                return compareTo;
+
             return Integer.compare(t1.hashCode(), t2.hashCode());
         }
+
+        private int compare(final Security s1, final Security s2)
+        {
+            if (s1 == s2)
+                return 0;
+            else if (s1 == null)
+                return -1;
+            else if (s2 == null)
+                return 1;
+
+            int d = TextUtil.compare(s1.getName(), s2.getName());
+            if (d != 0)
+                return d;
+
+            return s1.getUUID().compareTo(s2.getUUID());
+        }
+
     }
 
     private String uuid;

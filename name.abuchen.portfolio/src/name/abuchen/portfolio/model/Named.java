@@ -17,8 +17,13 @@ public interface Named extends Annotated
         @Override
         public int compare(Named n1, Named n2)
         {
-            if (n1 == null)
-                return n2 == null ? 0 : -1;
+            if (n1 == n2)
+                return 0;
+            else if (n1 == null)
+                return -1;
+            else if (n2 == null)
+                return 1;
+
             return TextUtil.compare(n1.getName(), n2.getName());
         }
     }
