@@ -5,11 +5,12 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class TradeCalendar implements Comparable<TradeCalendar>
@@ -25,19 +26,10 @@ public class TradeCalendar implements Comparable<TradeCalendar>
     private final boolean isSelectable;
 
     private final List<HolidayType> holidayTypes = new ArrayList<>();
-    private final Map<Integer, Map<LocalDate, Holiday>> cache = new HashMap<Integer, Map<LocalDate, Holiday>>()
-    {
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        public Map<LocalDate, Holiday> get(Object key)
-        {
-            return super.computeIfAbsent((Integer) key, year -> holidayTypes.stream()
-                            .map(type -> type.getHolidays(year)).flatMap(Collection::stream).filter(Objects::nonNull)
-                            .collect(Collectors.toMap(Holiday::getDate, holiday -> holiday, (right, left) -> right)));
-        }
-
-    };
+    private final Map<Integer, Map<LocalDate, Holiday>> cache = new ConcurrentHashMap<Integer, Map<LocalDate, Holiday>>();
+    private final Function<Integer, Map<LocalDate, Holiday>> collectDateHolidayOfYear = (year) -> holidayTypes.stream() //
+                    .map(type -> type.getHolidays(year)).flatMap(Collection::stream).filter(Objects::nonNull) //
+                    .collect(Collectors.toMap(Holiday::getDate, holiday -> holiday, (r, l) -> r));
 
     /* package */ TradeCalendar(String code, String description, Set<DayOfWeek> weekend, boolean isSelectable)
     {
@@ -86,6 +78,11 @@ public class TradeCalendar implements Comparable<TradeCalendar>
         return weekend.contains(date.getDayOfWeek());
     }
 
+    private Map<LocalDate, Holiday> getDateHolidayOfYear(int year)
+    {
+        return cache.computeIfAbsent(year, collectDateHolidayOfYear);
+    }
+
     /**
      * Tests whether {@code date} is a non-trading day, i.e. a holiday or
      * weekend day.
@@ -95,12 +92,12 @@ public class TradeCalendar implements Comparable<TradeCalendar>
         if (isWeekend(date))
             return true;
 
-        return cache.get(date.getYear()).containsKey(date);
+        return getDateHolidayOfYear(date.getYear()).containsKey(date);
     }
 
     public Holiday getHoliday(LocalDate date)
     {
-        return cache.get(date.getYear()).get(date);
+        return getDateHolidayOfYear(date.getYear()).get(date);
     }
 
     /**
@@ -116,7 +113,7 @@ public class TradeCalendar implements Comparable<TradeCalendar>
 
     public Collection<Holiday> getHolidays(int year)
     {
-        return cache.get(year).values();
+        return getDateHolidayOfYear(year).values();
     }
 
     @Override
