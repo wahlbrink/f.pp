@@ -175,15 +175,30 @@ public class ClientInput
         synchronized (pendingLock)
         {
             if (!pendingDirty)
-                return; // consumed by a save() that ran before we fired
+                return;
             recalculate = pendingRecalculate;
             pendingDirty = false;
             pendingRecalculate = false;
         }
-        setDirty(true, recalculate);
+        doSetDirty(true, recalculate);
     }
 
     private void setDirty(boolean isDirty, boolean recalculate)
+    {
+        synchronized (pendingLock)
+        {
+            if (pendingDirty)
+            {
+                isDirty = true;
+                recalculate |= pendingRecalculate;
+                pendingDirty = false;
+                pendingRecalculate = false;
+            }
+        }
+        doSetDirty(isDirty, recalculate);
+    }
+
+    private void doSetDirty(final boolean isDirty, final boolean recalculate)
     {
         this.isDirty = isDirty;
         this.listeners.forEach(l -> l.onDirty(this.isDirty));
@@ -265,21 +280,7 @@ public class ClientInput
                 storePreferences(false);
 
                 broker.post(UIConstants.Event.File.SAVED, clientFile.getAbsolutePath());
-
-                // Cancel any pending asyncExec dirty notification. If a background
-                // modification arrived during the save the on-disk file may not reflect
-                // it, so we conservatively remain dirty in that case.
-                boolean hadPendingModification;
-                boolean hadPendingRecalculate;
-                synchronized (pendingLock)
-                {
-                    hadPendingModification = pendingDirty;
-                    hadPendingRecalculate = pendingRecalculate;
-                    pendingDirty = false;
-                    pendingRecalculate = false;
-                }
-                setDirty(hadPendingModification, hadPendingRecalculate);
-
+                setDirty(false, false);
                 listeners.forEach(ClientInputListener::onSaved);
             }
             catch (IOException e)
