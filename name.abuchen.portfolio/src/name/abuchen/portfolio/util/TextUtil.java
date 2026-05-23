@@ -1,10 +1,12 @@
 package name.abuchen.portfolio.util;
 
-import java.text.Collator;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Locale;
 import java.util.regex.Pattern;
+
+import com.ibm.icu.text.Collator;
+
 
 public final class TextUtil
 {

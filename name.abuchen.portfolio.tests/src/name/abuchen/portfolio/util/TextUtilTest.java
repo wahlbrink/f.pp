@@ -223,6 +223,13 @@ public class TextUtilTest
     }
 
     @Test
+    public void testCompareWithBlank()
+    {
+        assertEquals(1, TextUtil.compare("AB", "A C"));
+        assertEquals(1, TextUtil.compare("AB", "A A"));
+    }
+
+    @Test
     public void testIsNumericMatch()
     {
         var decimalSeparator = new DecimalFormatSymbols().getDecimalSeparator();
