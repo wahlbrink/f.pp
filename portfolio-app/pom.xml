@@ -14,6 +14,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<tycho-version>5.0.3</tycho-version>
+		<jdt.ecj.version>3.46.0</jdt.ecj.version>
 		<maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
 		<maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
 		<maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
@@ -465,6 +466,13 @@
 					<groupId>org.eclipse.tycho</groupId>
 					<artifactId>tycho-compiler-plugin</artifactId>
 					<version>${tycho-version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>org.eclipse.jdt</groupId>
+							<artifactId>ecj</artifactId>
+							<version>${jdt.ecj.version}</version>
+						</dependency>
+					</dependencies>
 					<configuration>
 						<encoding>UTF-8</encoding>
 						<useProjectSettings>true</useProjectSettings>
