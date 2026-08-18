@@ -202,6 +202,24 @@ public class TradesTableViewer
         return category != null ? category.getAverageReturnMovingAverage() : null;
     }
 
+    static Double getTaxRate(Object element)
+    {
+        Trade trade = asTrade(element);
+        if (trade != null)
+        {
+            var profitLoss = trade.getProfitLossWithoutTaxesAndFees();
+            var taxes = trade.getTaxes();
+            if (profitLoss != null && taxes != null)
+            {
+                if (taxes.isZero())
+                    return 0.0;
+                return taxes.getAmount() / (double) profitLoss.getAmount();
+            }
+        }
+
+        return null;
+    }
+
     /**
      * Helper method to check if an element is a totals row
      */
@@ -599,6 +617,15 @@ public class TradesTableViewer
                         TradeTotals::getTotalProfitLossWithoutTaxesAndFees);
         column.setLabelProvider(withBoldFont(new MoneyColorLabelProvider(grossProfitLoss, view.getClient())));
         column.setCompareBy(grossProfitLoss);
+        column.setVisible(false);
+        support.addColumn(column);
+
+        column = new Column("taxrate", DataType.OTHER_NUMBER, "% Steuer", SWT.RIGHT, 80); //$NON-NLS-1$
+        column.setGroupLabel(Messages.ColumnProfitLoss);
+        column.setMenuLabel("% Steuer" + " (" + CostMethod.FIFO.getLabel() + ")"); //$NON-NLS-1$ //$NON-NLS-2$
+        Function<Object, Double> taxRate = TradesTableViewer::getTaxRate;
+        column.setLabelProvider(withBoldFont(new NumberColorLabelProvider<>(Values.Percent2, taxRate)));
+        column.setCompareBy(taxRate);
         column.setVisible(false);
         support.addColumn(column);
 

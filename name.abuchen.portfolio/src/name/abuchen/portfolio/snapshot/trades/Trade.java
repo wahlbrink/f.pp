@@ -20,6 +20,7 @@ import name.abuchen.portfolio.model.Portfolio;
 import name.abuchen.portfolio.model.PortfolioTransaction;
 import name.abuchen.portfolio.model.Security;
 import name.abuchen.portfolio.model.TaxesAndFees;
+import name.abuchen.portfolio.model.Transaction.Unit.Type;
 import name.abuchen.portfolio.model.TransactionPair;
 import name.abuchen.portfolio.money.CurrencyConverter;
 import name.abuchen.portfolio.money.Money;
@@ -67,6 +68,7 @@ public class Trade implements Adaptable
     private Money exitValue;
     private Money exitValueWithoutTaxesAndFees;
     private long holdingPeriod;
+    private Money taxes;
     private double irr;
 
     private LazyValue<Money> entryValueMovingAverage;
@@ -125,6 +127,11 @@ public class Trade implements Adaptable
                             .mapToLong(t -> t.getTransaction().getShares() * Dates.daysBetween(
                                             t.getTransaction().getDateTime().toLocalDate(), end.toLocalDate()))
                             .sum() / (double) shares);
+
+            this.taxes = transactions.stream() //
+                            .filter(t -> t.getTransaction().getType().isLiquidation() == isLong)
+                            .map(t -> t.getTransaction().getUnitSum(Type.TAX, converter))
+                            .collect(MoneyCollectors.sum(converter.getTermCurrency()));
         }
         else
         {
@@ -361,6 +368,11 @@ public class Trade implements Adaptable
             return exitValueWithoutTaxesAndFees.subtract(entryValueWithoutTaxesAndFees);
         else
             return entryValueWithoutTaxesAndFees.subtract(exitValueWithoutTaxesAndFees);
+    }
+
+    public Money getTaxes()
+    {
+        return taxes;
     }
 
     public Money getProfitLossMovingAverageWithoutTaxesAndFees()
