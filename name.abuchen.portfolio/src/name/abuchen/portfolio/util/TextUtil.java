@@ -83,6 +83,9 @@ public final class TextUtil
                                         .matcher(text).replaceAll("\n"); //$NON-NLS-1$
     }
 
+    private static final Pattern TO_SINGLE_LINE_PATTERN = Pattern
+                    .compile("([ \\t]*?(\\r\\n|[\\n\\r\\f\\u000B\\u0085\\u2028\\u2029])+?)++"); //$NON-NLS-1$
+
     /**
      * Convert, and sanitize, multi-line text into single-line text, by
      * replacing consecutive line breaks with spaces, to fit into table cells
@@ -95,8 +98,8 @@ public final class TextUtil
         // Maybe consider downleftwards_arrow+space ("intro"+sp) as separator to
         // make it consistent with inline editing: "\u21B2 "
         return text == null ? null
-                        : Pattern.compile("([ \\t]*?(\\r\\n|[\\n\\r\\f\\u000B\\u0085\\u2028\\u2029])+?)++") //$NON-NLS-1$
-                                        .matcher(text).replaceAll(" "); //$NON-NLS-1$
+                        : TO_SINGLE_LINE_PATTERN.matcher(text)
+                                        .replaceAll("\u2002\uFF5C"); //$NON-NLS-1$
     }
 
     /**
