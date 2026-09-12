@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -53,6 +54,9 @@ public class TopContributorsWidget extends AbstractTopContributorsWidget<ClientP
     {
     }
 
+    private static final EnumSet<CategoryType> ONLY_SECURITIES_CATEGORIES = EnumSet.of(CategoryType.CAPITAL_GAINS,
+                    CategoryType.REALIZED_CAPITAL_GAINS, CategoryType.EARNINGS);
+
     public TopContributorsWidget(Widget widget, DashboardData dashboardData)
     {
         super(widget, dashboardData);
@@ -92,18 +96,38 @@ public class TopContributorsWidget extends AbstractTopContributorsWidget<ClientP
 
     private List<ContributorRecord> buildRecords(ClientPerformanceSnapshot snapshot, boolean onlySecurities)
     {
+        if (onlySecurities)
+        {
+            var securityRecords = new HashMap<Security, ContributorRecord>();
+            for (var type : ONLY_SECURITIES_CATEGORIES)
+            {
+                var category = snapshot.getCategoryByType(type);
+                if (category == null)
+                    continue;
+
+                for (Position position : category.getPositions())
+                {
+                    if (position.getValue().getAmount() == 0)
+                        continue;
+
+                    securityRecords.compute(position.getSecurity(), (s, r2) -> {
+                        Money value = (r2 == null) ? position.getValue() : position.getValue().add(r2.value);
+                        if (value.getAmount() == 0)
+                            return null;
+                        return new ContributorRecord(position.getLabel(), position.getSecurity(), "", //$NON-NLS-1$
+                                        false, value, value.getAmount() > 0);
+                    });
+                }
+
+            }
+            return new ArrayList<>(securityRecords.values());
+        }
+
         var records = new ArrayList<ContributorRecord>();
-
-        var onlySecuritiesCategories = EnumSet.of(CategoryType.CAPITAL_GAINS, CategoryType.REALIZED_CAPITAL_GAINS);
-
         for (var type : CategoryType.values()) // NOSONAR
         {
             if (type == CategoryType.INITIAL_VALUE || type == CategoryType.FINAL_VALUE)
                 continue;
-
-            if (onlySecurities && !onlySecuritiesCategories.contains(type))
-                continue;
-
             var category = snapshot.getCategoryByType(type);
             if (category == null)
                 continue;
@@ -117,11 +141,7 @@ public class TopContributorsWidget extends AbstractTopContributorsWidget<ClientP
                 if (value.getAmount() == 0)
                     continue;
 
-                boolean isPositive;
-                if (value.getAmount() > 0)
-                    isPositive = "+".equals(category.getSign()); //$NON-NLS-1$
-                else
-                    isPositive = "-".equals(category.getSign()); //$NON-NLS-1$
+                boolean isPositive = ((value.getAmount() > 0) ? "+" : "-").equals(category.getSign()); //$NON-NLS-1$ //$NON-NLS-2$
 
                 records.add(new ContributorRecord(position.getLabel(), position.getSecurity(), category.getLabel(),
                                 needsExplanation, value, isPositive));
@@ -130,4 +150,5 @@ public class TopContributorsWidget extends AbstractTopContributorsWidget<ClientP
 
         return records;
     }
+
 }
